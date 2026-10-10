@@ -602,29 +602,45 @@ class UIManager {
 
     // Overview Stats
     document.getElementById('modalBizStatsCards').innerHTML = `
-      <div class="col-md-3 col-6">
-        <div class="p-2 rounded bg-dark border border-secondary text-center">
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
           <div class="text-white-50 small mb-1">رأس المال المستثمر</div>
           <div class="fw-bold fs-6 text-white">${this.formatMoney(biz.totalCapital)} د.ل</div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="p-2 rounded bg-dark border border-secondary text-center">
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
           <div class="text-white-50 small mb-1">متوسط تكلفة القطعة</div>
           <div class="fw-bold fs-6 text-info">${this.formatMoney(biz.unitCost)} د.ل</div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="p-2 rounded bg-dark border border-secondary text-center">
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
           <div class="text-white-50 small mb-1">إجمالي المبيعات</div>
           <div class="fw-bold fs-6 text-white">${this.formatMoney(metrics.totalSalesRevenue)} د.ل</div>
         </div>
       </div>
-      <div class="col-md-3 col-6">
-        <div class="p-2 rounded bg-dark border border-secondary text-center">
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
           <div class="text-white-50 small mb-1">صافي الربح المحقق</div>
           <div class="fw-bold fs-6 ${metrics.realizedNetProfit >= 0 ? 'text-success' : 'text-danger'}">
             ${this.formatMoney(metrics.realizedNetProfit)} د.ل
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
+          <div class="text-white-50 small mb-1">متوسط الربح في القطعة</div>
+          <div class="fw-bold fs-6 ${metrics.avgProfitPerUnit >= 0 ? 'text-success' : 'text-danger'}">
+            ${this.formatMoney(metrics.avgProfitPerUnit)} د.ل
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-4 col-6">
+        <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
+          <div class="text-white-50 small mb-1">نسبة الربح في المشروع</div>
+          <div class="fw-bold fs-6 ${metrics.profitMargin >= 0 ? 'text-success' : 'text-danger'}">
+            ${metrics.profitMargin}%
           </div>
         </div>
       </div>

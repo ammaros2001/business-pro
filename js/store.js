@@ -249,6 +249,8 @@ class DataStore {
     const profitMargin = totalSalesRevenue > 0 ? (realizedNetProfit / totalSalesRevenue) * 100 : 0;
     const roi = biz.totalCapital > 0 ? (realizedNetProfit / biz.totalCapital) * 100 : 0;
 
+    const avgProfitPerUnit = soldQuantity > 0 ? (realizedNetProfit / soldQuantity) : 0;
+
     return {
       biz,
       initialQuantity: biz.totalQuantity,
@@ -265,6 +267,7 @@ class DataStore {
       totalDirectSellingExpenses: Math.round(totalDirectSellingExpenses * 100) / 100,
       totalOperatingExpenses: Math.round(totalOperatingExpenses * 100) / 100,
       realizedNetProfit: Math.round(realizedNetProfit * 100) / 100,
+      avgProfitPerUnit: Math.round(avgProfitPerUnit * 100) / 100,
       profitMargin: Math.round(profitMargin * 10) / 10,
       roi: Math.round(roi * 10) / 10,
       salesCount: sales.length,
