@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <!-- Custom Dark Emerald Theme CSS -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3.3">
 </head>
 <body>
 
@@ -235,7 +235,7 @@
     <!-- Top Navigation Bar -->
     <header class="app-topbar">
       <div class="topbar-left">
-        <button class="mobile-toggle" id="mobileMenuBtn">
+        <button class="mobile-toggle" id="mobileMenuBtn" aria-label="فتح القائمة">
           <i class="bi bi-list"></i>
         </button>
         <h1 class="topbar-page-title" id="topbarTitle">
@@ -244,10 +244,11 @@
         </h1>
       </div>
 
+      <div class="topbar-right">
         <!-- Quick Action: Add Sale Button -->
-        <button class="btn btn-emerald btn-sm" id="quickAddSaleBtn">
+        <button class="btn btn-emerald btn-sm" id="quickAddSaleBtn" title="تسجيل بيع جديد">
           <i class="bi bi-cart-plus-fill"></i>
-          <span>تسجيل بيع جديد</span>
+          <span class="d-none d-sm-inline">تسجيل بيع</span>
         </button>
 
         <!-- Quick Sync Cloud Button -->
@@ -255,22 +256,22 @@
           <i class="bi bi-cloud-arrow-up-fill"></i>
         </button>
 
-        <!-- Print Page Button -->
-        <button class="btn-icon-custom no-print" onclick="window.print()" title="طباعة">
+        <!-- Print Page Button (Hidden on Mobile) -->
+        <button class="btn-icon-custom no-print d-none d-md-inline-flex" onclick="window.print()" title="طباعة">
           <i class="bi bi-printer-fill"></i>
         </button>
 
         <!-- User Cloud Auth Status & Modal Trigger -->
-        <div id="topbarAuthWrapper" class="d-inline-flex align-items-center ms-1">
+        <div id="topbarAuthWrapper" class="d-inline-flex align-items-center">
           <button class="btn btn-outline-emerald btn-sm d-flex align-items-center gap-1" id="topbarLoginBtn" type="button" data-bs-toggle="modal" data-bs-target="#authModal">
             <i class="bi bi-person-circle"></i>
-            <span class="d-none d-sm-inline">تسجيل الدخول</span>
+            <span class="d-none d-sm-inline">دخول</span>
           </button>
           
           <div id="topbarUserDropdown" class="dropdown d-none">
-            <button class="btn btn-dark-subtle btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-dark-subtle btn-sm dropdown-toggle d-flex align-items-center gap-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <span class="status-indicator online"></span>
-              <span id="topbarUserName" class="text-truncate" style="max-width: 120px;">المستخدم</span>
+              <span id="topbarUserName" class="text-truncate" style="max-width: 90px;">المستخدم</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
               <li class="px-3 py-2 border-bottom border-secondary border-opacity-25">
@@ -283,6 +284,7 @@
             </ul>
           </div>
         </div>
+      </div>
     </header>
 
     <!-- App Content Body -->
@@ -892,6 +894,10 @@
         </div>
 
         <!-- Sales Data Table -->
+        <div class="table-scroll-hint">
+          <i class="bi bi-arrows-expand-vertical"></i>
+          <span>اسحب الجدول أفقياً للاطلاع على كافة الأعمدة والإجراءات</span>
+        </div>
         <div class="table-custom-responsive">
           <table class="table-custom">
             <thead>
@@ -959,6 +965,10 @@
         </div>
 
         <!-- Expenses Table -->
+        <div class="table-scroll-hint">
+          <i class="bi bi-arrows-expand-vertical"></i>
+          <span>اسحب الجدول أفقياً للاطلاع على كافة الأعمدة والإجراءات</span>
+        </div>
         <div class="table-custom-responsive">
           <table class="table-custom">
             <thead>
@@ -1004,6 +1014,10 @@
           <h6 class="fw-bold text-white mb-3">
             <i class="bi bi-table text-success me-1"></i> جدول التحليل المالي المقارن للمشاريع
           </h6>
+          <div class="table-scroll-hint">
+            <i class="bi bi-arrows-expand-vertical"></i>
+            <span>اسحب الجدول أفقياً لرؤية جميع المؤشرات والنسب</span>
+          </div>
           <div class="table-custom-responsive">
             <table class="table-custom">
               <thead>
@@ -1034,6 +1048,10 @@
               <i class="bi bi-person-exclamation text-danger me-1"></i> كشف الديون والمستحقات الآجلة على الزبائن
             </h6>
             <span class="badge bg-danger text-white" id="reportsTotalDebtBadge">0.00 د.ل</span>
+          </div>
+          <div class="table-scroll-hint">
+            <i class="bi bi-arrows-expand-vertical"></i>
+            <span>اسحب الجدول أفقياً لرؤية تفاصيل الديون والتحصيل</span>
           </div>
           <div class="table-custom-responsive">
             <table class="table-custom">
@@ -1231,6 +1249,36 @@
       </section>
 
     </div>
+
+    <!-- Mobile Bottom Navigation Bar (شريط التنقل السفلي للهواتف الذكية) -->
+    <nav class="mobile-bottom-nav d-lg-none" id="mobileBottomNav">
+      <button type="button" class="mobile-nav-btn active" data-section="dashboard" title="لوحة التحكم">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>الرئيسية</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-section="businesses" title="المشاريع">
+        <i class="bi bi-briefcase-fill"></i>
+        <span>المشاريع</span>
+      </button>
+      <button type="button" class="mobile-nav-btn action-center" id="bottomNavQuickSaleBtn" title="تسجيل بيع سريع">
+        <div class="center-btn-icon">
+          <i class="bi bi-cart-plus-fill"></i>
+        </div>
+        <span>بيع جديد</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-section="sales" title="المبيعات">
+        <i class="bi bi-cart-check-fill"></i>
+        <span>المبيعات</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-section="expenses" title="المصروفات">
+        <i class="bi bi-wallet2"></i>
+        <span>المصروفات</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" id="bottomNavMenuBtn" title="المزيد والقائمة">
+        <i class="bi bi-list"></i>
+        <span>المزيد</span>
+      </button>
+    </nav>
   </main>
 </div>
 
@@ -1395,19 +1443,19 @@
             <div class="col-12 mt-3">
               <div class="p-3 rounded border border-success bg-dark">
                 <div class="row g-2 text-center">
-                  <div class="col-md-3">
+                  <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">إجمالي الفاتورة:</span>
                     <span class="fs-6 fw-bold text-white" id="saleCalcTotal">0.00 د.ل</span>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">تكلفة البضاعة (COGS):</span>
                     <span class="fs-6 fw-bold text-info" id="saleCalcCogs">0.00 د.ل</span>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">صافي الربح المتوقع:</span>
                     <span class="fs-6 fw-bold text-success" id="saleCalcProfit">0.00 د.ل</span>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">حالة الدفع والمتبقي:</span>
                     <span class="badge badge-paid-full" id="saleCalcStatusBadge">مدفوع بالكامل</span>
                     <div class="text-danger small mt-1" id="saleCalcRemaining">المتبقي: 0.00 د.ل</div>
@@ -1791,11 +1839,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <!-- Modular Application Scripts -->
-<script src="js/firebase-config.js?v=3.2"></script>
-<script src="js/store.js?v=3.2"></script>
-<script src="js/firebase-service.js?v=3.2"></script>
-<script src="js/ui.js?v=3.2"></script>
-<script src="js/app.js?v=3.2"></script>
+<script src="js/firebase-config.js?v=3.3"></script>
+<script src="js/store.js?v=3.3"></script>
+<script src="js/firebase-service.js?v=3.3"></script>
+<script src="js/ui.js?v=3.3"></script>
+<script src="js/app.js?v=3.3"></script>
 
 </body>
 </html>

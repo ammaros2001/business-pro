@@ -65,6 +65,40 @@ class UIManager {
       });
     }
 
+    // Mobile Bottom Navigation Bar Events
+    const bottomNavBtns = document.querySelectorAll('.mobile-bottom-nav .mobile-nav-btn[data-section]');
+    bottomNavBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetSection = btn.getAttribute('data-section');
+        this.navigateTo(targetSection);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    const bottomSaleBtn = document.getElementById('bottomNavQuickSaleBtn');
+    if (bottomSaleBtn) {
+      bottomSaleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.app && typeof window.app.resetSaleModal === 'function') {
+          window.app.resetSaleModal();
+        }
+        if (this.saleModal) this.saleModal.show();
+      });
+    }
+
+    const bottomMenuBtn = document.getElementById('bottomNavMenuBtn');
+    if (bottomMenuBtn) {
+      bottomMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const sidebar = document.getElementById('appSidebar');
+        if (sidebar && backdrop) {
+          sidebar.classList.add('show');
+          backdrop.classList.add('show');
+        }
+      });
+    }
+
     // Handle initial hash if any
     const hash = window.location.hash.replace('#', '');
     if (hash && document.getElementById(`section-${hash}`)) {
@@ -79,16 +113,25 @@ class UIManager {
     // Deactivate nav links
     document.querySelectorAll('.sidebar-nav .nav-link-custom').forEach(link => link.classList.remove('active'));
 
+    // Deactivate mobile bottom nav buttons
+    document.querySelectorAll('.mobile-bottom-nav .mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
+
     // Show target section
     const targetEl = document.getElementById(`section-${sectionId}`);
     if (targetEl) {
       targetEl.classList.add('active');
     }
 
-    // Activate corresponding link
+    // Activate corresponding sidebar link
     const activeLink = document.querySelector(`.sidebar-nav .nav-link-custom[data-section="${sectionId}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
+    }
+
+    // Activate corresponding mobile bottom nav button
+    const activeBottomBtn = document.querySelector(`.mobile-bottom-nav .mobile-nav-btn[data-section="${sectionId}"]`);
+    if (activeBottomBtn) {
+      activeBottomBtn.classList.add('active');
     }
 
     // Update Topbar Title
