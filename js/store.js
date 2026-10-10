@@ -521,35 +521,40 @@ class DataStore {
   getGlobalDashboardStats() {
     const activeBusinesses = this.state.businesses.filter(b => b.status === 'active');
     
-    // إجمالي رأس المال المستثمر (في المشاريع النشطة)
-    const totalCapital = activeBusinesses.reduce((sum, b) => sum + (parseFloat(b.totalCapital) || 0), 0);
+    // 1. حساب رأس المال الإجمالي لجميع المشاريع المسجلة
+    const allBusinesses = this.state.businesses;
+    const totalCapital = allBusinesses.reduce((sum, b) => sum + (parseFloat(b.totalCapital) || 0), 0);
 
-    // إجمالي المبيعات المحققة
+    // 2. إجمالي المبيعات المحققة
     const totalSalesRevenue = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.totalAmount) || 0), 0);
 
-    // إجمالي المبالغ المحصلة والديون
+    // 3. إجمالي المبالغ المحصلة والديون
     const totalCollected = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.paidAmount) || 0), 0);
     const totalDebts = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.remainingAmount) || 0), 0);
 
-    // تكلفة البضاعة المباعة الإجمالية COGS
+    // 4. تكلفة البضاعة المباعة COGS والمصاريف المباشرة
     const totalCOGS = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.cogs) || 0), 0);
-
-    // مصاريف البيع المباشرة (مثل عمولات التوصيل المخصومة)
     const totalDirectSellingExpenses = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.sellingExpenses) || 0), 0);
 
-    // إجمالي المصروفات التشغيلية الإضافية
+    // 5. إجمالي المصروفات التشغيلية الإضافية
     const totalOperatingExpenses = this.state.expenses.reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
-
-    // إجمالي المصروفات الكلية (المصروفات التشغيلية + مصاريف البيع المباشرة)
     const totalExpenses = totalOperatingExpenses + totalDirectSellingExpenses;
 
-    // صافي الربح المحقق الكلي = إجمالي المبيعات - إجمالي رأس المال المستثمر - المصروفات الكلية
-    const netProfit = totalSalesRevenue - totalCapital - totalExpenses;
+    // 6. صافي الأرباح المحققة:
+    // إذا كانت هناك مشاريع مسجلة برأس مال: المبيعات - رأس المال الإجمالي - المصروفات
+    // إذا لم تكن هناك مشاريع مسجلة برأس مال (أو تم حذف المشروع): نعتمد على تكلفة البضاعة المسجلة في الفواتير (COGS)
+    let netProfit = 0;
+    if (totalCapital > 0) {
+      netProfit = totalSalesRevenue - totalCapital - totalExpenses;
+    } else {
+      netProfit = totalSalesRevenue - totalCOGS - totalExpenses;
+    }
+
     const profitMargin = totalSalesRevenue > 0 ? (netProfit / totalSalesRevenue) * 100 : 0;
 
-    // قيمة المخزون المتبقي لجميع المشاريع النشطة
+    // قيمة المخزون المتبقي لجميع المشاريع
     let remainingStockValue = 0;
-    activeBusinesses.forEach(biz => {
+    allBusinesses.forEach(biz => {
       const metrics = this.getBusinessMetrics(biz.id);
       if (metrics) remainingStockValue += metrics.remainingStockValue;
     });
@@ -564,6 +569,7 @@ class DataStore {
       totalDebts: Math.round(totalDebts * 100) / 100,
       totalCollected: Math.round(totalCollected * 100) / 100,
       activeBusinessesCount: activeBusinesses.length,
+      allBusinessesCount: allBusinesses.length,
       closedBusinessesCount: this.state.businesses.filter(b => b.status === 'closed').length,
       totalSalesCount: this.state.sales.length
     };
