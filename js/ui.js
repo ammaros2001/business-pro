@@ -638,9 +638,9 @@ class UIManager {
       </div>
       <div class="col-lg-2 col-md-4 col-6">
         <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-center">
-          <div class="text-white-50 small mb-1">نسبة الربح في المشروع</div>
-          <div class="fw-bold fs-6 ${metrics.profitMargin >= 0 ? 'text-success' : 'text-danger'}">
-            ${metrics.profitMargin}%
+          <div class="text-white-50 small mb-1">نسبة العائد من رأس المال</div>
+          <div class="fw-bold fs-6 ${metrics.roi >= 0 ? 'text-success' : 'text-danger'}">
+            ${metrics.roi}%
           </div>
         </div>
       </div>
