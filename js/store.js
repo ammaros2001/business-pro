@@ -537,23 +537,24 @@ class DataStore {
     const totalDirectSellingExpenses = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.sellingExpenses) || 0), 0);
 
     // 5. المصروفات التشغيلية والتسويقية
-    // تكلفة الإعلانات الممولة (من رأس مال المشاريع + المصروفات المسجلة)
+    // تكلفة الإعلانات الممولة من المشاريع المسجلة
     const bizMarketingTotal = allBusinesses.reduce((sum, b) => sum + (b.enableMarketing ? (parseFloat(b.marketingCostLYD) || 0) : 0), 0);
+    // تكلفة الإعلانات من المصروفات التشغيلية العامة المسجلة
     const expMarketingTotal = this.state.expenses
       .filter(e => e.category === 'marketing')
       .reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
     const totalMarketingCost = bizMarketingTotal + expMarketingTotal;
 
     const totalOperatingExpenses = this.state.expenses.reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
-    // إجمالي المصروفات الكلية (المصروفات التشغيلية + مصاريف البيع المباشرة)
-    const totalExpenses = totalOperatingExpenses + totalDirectSellingExpenses;
+    // إجمالي المصروفات الكلية المعروضة في الداشبورد تشمل (المصروفات التشغيلية + مصاريف البيع + إعلانات المشاريع الممولة)
+    const totalExpenses = totalOperatingExpenses + totalDirectSellingExpenses + bizMarketingTotal;
 
     // 6. صافي الأرباح المحققة:
-    // إذا كانت هناك مشاريع مسجلة برأس مال: المبيعات - رأس المال الإجمالي - المصروفات
-    // إذا لم تكن هناك مشاريع مسجلة برأس مال (أو تم حذف المشروع): نعتمد على تكلفة البضاعة المسجلة في الفواتير (COGS)
+    // بما أن رأس المال المستثمر في المشروع يحتوي على (الشراء + الشحن + الإضافية + الإعلانات)
+    // فإن: المبيعات - رأس المال الإجمالي - المصروفات التشغيلية العامة (بدون تكرار خصم إعلانات المشروع مرتين)
     let netProfit = 0;
     if (totalCapital > 0) {
-      netProfit = totalSalesRevenue - totalCapital - totalExpenses;
+      netProfit = totalSalesRevenue - totalCapital - (totalOperatingExpenses + totalDirectSellingExpenses);
     } else {
       netProfit = totalSalesRevenue - totalCOGS - totalExpenses;
     }

@@ -412,17 +412,56 @@ class UIManager {
         other: { label: 'أخرى', total: 0 }
       };
 
+      // 1. حساب المصروفات التشغيلية المسجلة
       store.state.expenses.forEach(e => {
         const cat = e.category || 'other';
         if (catMap[cat]) {
-          catMap[cat].total += (e.amountLYD || 0);
+          catMap[cat].total += (parseFloat(e.amountLYD) || 0);
         } else {
-          catMap.other.total += (e.amountLYD || 0);
+          catMap.other.total += (parseFloat(e.amountLYD) || 0);
         }
       });
 
-      const labels = Object.values(catMap).map(c => c.label);
-      const data = Object.values(catMap).map(c => c.total);
+      // 2. إضافة تكاليف الإعلانات الممولة للمشاريع
+      store.state.businesses.forEach(b => {
+        if (b.enableMarketing && (parseFloat(b.marketingCostLYD) || 0) > 0) {
+          catMap.marketing.total += (parseFloat(b.marketingCostLYD) || 0);
+        }
+      });
+
+      // 3. إضافة مصاريف البيع المباشرة (إن وجدت)
+      store.state.sales.forEach(s => {
+        if ((parseFloat(s.sellingExpenses) || 0) > 0) {
+          catMap.other.total += (parseFloat(s.sellingExpenses) || 0);
+        }
+      });
+
+      const colorPalette = {
+        marketing: '#10b981',
+        packaging: '#06b6d4',
+        delivery: '#f59e0b',
+        returns: '#ef4444',
+        salaries: '#8b5cf6',
+        other: '#64748b'
+      };
+
+      // نأخذ الفئات التي تحتوي على مبالغ > 0 ليكون الرسم البياني واضحاً وأنيقاً
+      const activeEntries = Object.entries(catMap).filter(([_, c]) => c.total > 0);
+
+      let labels = [];
+      let data = [];
+      let backgroundColor = [];
+
+      if (activeEntries.length > 0) {
+        labels = activeEntries.map(([_, c]) => c.label);
+        data = activeEntries.map(([_, c]) => Math.round(c.total));
+        backgroundColor = activeEntries.map(([key, _]) => colorPalette[key] || '#10b981');
+      } else {
+        // حالة عدم وجود أي مصروفات
+        labels = ['لا توجد مصروفات'];
+        data = [1];
+        backgroundColor = ['rgba(255, 255, 255, 0.08)'];
+      }
 
       this.expensesChart = new Chart(ctx, {
         type: 'doughnut',
@@ -430,14 +469,7 @@ class UIManager {
           labels,
           datasets: [{
             data,
-            backgroundColor: [
-              '#10b981',
-              '#06b6d4',
-              '#f59e0b',
-              '#ef4444',
-              '#8b5cf6',
-              '#64748b'
-            ],
+            backgroundColor,
             borderColor: '#141e19',
             borderWidth: 2
           }]
@@ -449,6 +481,14 @@ class UIManager {
             legend: {
               position: 'bottom',
               labels: { color: '#94a3b8', font: { family: 'Cairo', size: 11 }, boxWidth: 12 }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  if (activeEntries.length === 0) return 'لا توجد مصروفات مسجلة';
+                  return ` ${ctx.label}: ${Math.round(ctx.raw)} د.ل`;
+                }
+              }
             }
           }
         }
