@@ -30,7 +30,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 
   <!-- Custom Dark Emerald Theme CSS -->
-  <link rel="stylesheet" href="css/style.css?v=3.3">
+  <link rel="stylesheet" href="css/style.css?v=3.5">
 </head>
 <body>
 
@@ -334,12 +334,12 @@
            =================================================================== -->
       <section id="section-dashboard" class="spa-section active">
         <!-- Six Smart Financial KPI Cards -->
-        <div class="row g-3 mb-4">
+        <div class="row g-2 g-md-3 mb-4" id="dashboardKpiRow">
           <!-- 1. إجمالي رأس المال المستثمر -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
-                <span class="stat-title">إجمالي رأس المال المستثمر</span>
+                <span class="stat-title">إجمالي رأس المال</span>
                 <div class="stat-icon green"><i class="bi bi-piggy-bank"></i></div>
               </div>
               <div class="stat-value">
@@ -347,16 +347,16 @@
                 <span class="stat-currency">د.ل</span>
               </div>
               <div class="text-muted small">
-                في <span id="kpiActiveBizCount" class="text-white fw-bold">0</span> مشاريع نشطة حالياً
+                في <span id="kpiActiveBizCount" class="text-white fw-bold">0</span> مشاريع نشطة
               </div>
             </div>
           </div>
 
           <!-- 2. إجمالي المبيعات المحققة -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
-                <span class="stat-title">إجمالي المبيعات المحققة</span>
+                <span class="stat-title">المبيعات المحققة</span>
                 <div class="stat-icon green"><i class="bi bi-cash-stack"></i></div>
               </div>
               <div class="stat-value">
@@ -364,13 +364,13 @@
                 <span class="stat-currency">د.ل</span>
               </div>
               <div class="text-muted small">
-                المحصل نقداً: <span id="kpiCollectedAmount" class="text-success fw-bold">0.00 د.ل</span>
+                المحصل: <span id="kpiCollectedAmount" class="text-success fw-bold">0.00 د.ل</span>
               </div>
             </div>
           </div>
 
           <!-- 3. إجمالي المصروفات والترويج الممول -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
                 <span class="stat-title">المصروفات والإعلانات</span>
@@ -380,18 +380,18 @@
                 <span id="kpiTotalExpenses">0.00</span>
                 <span class="stat-currency">د.ل</span>
               </div>
-              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary small">
-                <span class="text-info"><i class="bi bi-megaphone-fill me-1"></i> إعلانات ممولة: <strong id="kpiMarketingCost" class="text-white">0 د.ل</strong></span>
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary small stat-subinfo">
+                <span class="text-info"><i class="bi bi-megaphone-fill me-1"></i> إعلانات: <strong id="kpiMarketingCost" class="text-white">0 د.ل</strong></span>
                 <span class="text-muted">أخرى: <strong id="kpiOtherExpenses" class="text-white">0 د.ل</strong></span>
               </div>
             </div>
           </div>
 
           <!-- 4. صافي الأرباح / الخسائر -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
-                <span class="stat-title">صافي الأرباح المحققة</span>
+                <span class="stat-title">صافي الأرباح</span>
                 <div class="stat-icon green" id="kpiProfitIcon"><i class="bi bi-graph-up-arrow"></i></div>
               </div>
               <div class="stat-value" id="kpiNetProfitContainer">
@@ -400,17 +400,17 @@
               </div>
               <div>
                 <span class="stat-badge profit-positive" id="kpiProfitMarginBadge">
-                  <i class="bi bi-percent"></i> هامش الربح: <span id="kpiProfitMargin">0%</span>
+                  <i class="bi bi-percent"></i> الهامش: <span id="kpiProfitMargin">0%</span>
                 </span>
               </div>
             </div>
           </div>
 
           <!-- 5. قيمة المخزون المتبقي -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
-                <span class="stat-title">قيمة المخزون المتبقي</span>
+                <span class="stat-title">المخزون المتبقي</span>
                 <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
               </div>
               <div class="stat-value">
@@ -418,16 +418,16 @@
                 <span class="stat-currency">د.ل</span>
               </div>
               <div class="text-muted small">
-                محسوبة بدقة بناءً على تكلفة القطعة الأصلية
+                حسب تكلفة القطعة
               </div>
             </div>
           </div>
 
           <!-- 6. إجمالي الديون والمبالغ المستحقة -->
-          <div class="col-xl-4 col-md-6">
+          <div class="col-6 col-md-6 col-xl-4">
             <div class="custom-card stat-card">
               <div class="stat-header">
-                <span class="stat-title">ديون مستحقة (مبيعات بالأجل)</span>
+                <span class="stat-title">ديون مستحقة (آجلة)</span>
                 <div class="stat-icon red"><i class="bi bi-exclamation-triangle"></i></div>
               </div>
               <div class="stat-value text-danger">
@@ -435,7 +435,7 @@
                 <span class="stat-currency text-danger">د.ل</span>
               </div>
               <div class="text-muted small">
-                مبالغ تنتظر التحصيل من العملاء
+                بانتظار التحصيل
               </div>
             </div>
           </div>
@@ -484,6 +484,10 @@
                   <i class="bi bi-clock-history text-success me-1"></i> أحدث عمليات البيع
                 </h6>
                 <button class="btn btn-sm btn-outline-emerald" onclick="ui.navigateTo('sales')">عرض الكل</button>
+              </div>
+              <div class="table-scroll-hint">
+                <i class="bi bi-arrows-expand-vertical"></i>
+                <span>اسحب الجدول أفقياً للاطلاع على الفواتير</span>
               </div>
               <div class="table-custom-responsive">
                 <table class="table-custom">
@@ -547,9 +551,24 @@
            3. نموذج إضافة / تعديل بزنس (ADD / EDIT BUSINESS)
            =================================================================== -->
       <section id="section-add-business" class="spa-section">
-        <div class="mb-4">
+        <div class="mb-3">
           <h4 class="fw-bold text-white mb-1" id="businessFormTitle">إضافة مشروع تجاري جديد</h4>
           <p class="text-muted small mb-0">قم بإدخال بيانات الشراء، الشحن، والمصاريف الإضافية لحساب تكلفة القطعة بدقة</p>
+        </div>
+
+        <!-- Mobile Sticky Quick Calculation Pill (يظهر على الهواتف لتحديث التكلفة لحظياً) -->
+        <div class="mobile-live-summary-sticky d-lg-none mb-3">
+          <div class="d-flex align-items-center justify-content-between p-2 px-3 rounded-3 mobile-calc-pill">
+            <div class="d-flex flex-column">
+              <span class="text-white-50" style="font-size: 0.7rem;">تكلفة القطعة الواحدة:</span>
+              <span class="fw-bold font-monospace" style="font-size: 1.05rem; color: var(--neon-green);" id="mobileSummaryUnitCost">0.00 د.ل</span>
+            </div>
+            <div class="vr bg-secondary opacity-50 mx-2"></div>
+            <div class="d-flex flex-column text-end">
+              <span class="text-white-50" style="font-size: 0.7rem;">إجمالي رأس المال:</span>
+              <span class="fw-bold text-white font-monospace" style="font-size: 1.05rem;" id="mobileSummaryTotalCapital">0.00 د.ل</span>
+            </div>
+          </div>
         </div>
 
         <form id="businessForm" onsubmit="return false;">
@@ -612,16 +631,16 @@
                 <div class="row g-3">
                   <div class="col-md-12">
                     <label class="form-label">نظام العملة المستخدمة في الشراء:</label>
-                    <div class="d-flex gap-3">
-                      <div class="form-check">
+                    <div class="d-flex flex-wrap gap-2">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="currencyMode" id="currModeLYD" value="lyd" checked>
-                        <label class="form-check-label text-white" for="currModeLYD">
+                        <label class="form-check-label text-white w-100" for="currModeLYD">
                           بالدينار الليبي فقط (د.ل)
                         </label>
                       </div>
-                      <div class="form-check">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="currencyMode" id="currModeUSD" value="usd_lyd">
-                        <label class="form-check-label text-white" for="currModeUSD">
+                        <label class="form-check-label text-white w-100" for="currModeUSD">
                           بالدولار الأمريكي ($) والدينار
                         </label>
                       </div>
@@ -667,16 +686,16 @@
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label">نوع الشحن:</label>
-                    <div class="d-flex gap-3">
-                      <div class="form-check">
+                    <div class="d-flex flex-wrap gap-2">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="shippingType" id="shipSea" value="sea" checked>
-                        <label class="form-check-label text-white" for="shipSea">
+                        <label class="form-check-label text-white w-100" for="shipSea">
                           شحن بحري 🚢 (CBM)
                         </label>
                       </div>
-                      <div class="form-check">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="shippingType" id="shipAir" value="air">
-                        <label class="form-check-label text-white" for="shipAir">
+                        <label class="form-check-label text-white w-100" for="shipAir">
                           شحن جوي ✈️ (كجم)
                         </label>
                       </div>
@@ -685,14 +704,14 @@
 
                   <div class="col-md-6">
                     <label class="form-label">عملة حساب الشحن:</label>
-                    <div class="d-flex gap-3">
-                      <div class="form-check">
+                    <div class="d-flex flex-wrap gap-2">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="shippingCurrencyMode" id="shipCurrLYD" value="lyd" checked>
-                        <label class="form-check-label text-white" for="shipCurrLYD">دينار (د.ل)</label>
+                        <label class="form-check-label text-white w-100" for="shipCurrLYD">دينار (د.ل)</label>
                       </div>
-                      <div class="form-check">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="shippingCurrencyMode" id="shipCurrUSD" value="usd_lyd">
-                        <label class="form-check-label text-white" for="shipCurrUSD">دولار ($) مع صرف</label>
+                        <label class="form-check-label text-white w-100" for="shipCurrUSD">دولار ($) مع صرف</label>
                       </div>
                     </div>
                   </div>
@@ -743,7 +762,7 @@
                     <i class="bi bi-tags-fill text-success me-1"></i> بنود التكاليف الإضافية والإعلانات
                   </h6>
                   <button type="button" class="btn btn-outline-emerald btn-sm" id="addExtraCostBtn">
-                    <i class="bi bi-plus-lg"></i> إضافة تكلفة إضافية +
+                    <i class="bi bi-plus-lg"></i> إضافة تكلفة +
                   </button>
                 </div>
 
@@ -764,16 +783,16 @@
                 <div class="row g-3 d-none" id="marketingCostInputGroup">
                   <div class="col-12">
                     <label class="form-label text-white small">عملة تكلفة الإعلانات:</label>
-                    <div class="d-flex gap-4">
-                      <div class="form-check">
+                    <div class="d-flex flex-wrap gap-3">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="bizMarketingCurrMode" id="marketingCurrLYD" value="lyd" checked>
-                        <label class="form-check-label text-white" for="marketingCurrLYD">
+                        <label class="form-check-label text-white w-100" for="marketingCurrLYD">
                           بالدينار الليبي (د.ل)
                         </label>
                       </div>
-                      <div class="form-check">
+                      <div class="form-check segmented-choice-pill flex-fill">
                         <input class="form-check-input" type="radio" name="bizMarketingCurrMode" id="marketingCurrUSD" value="usd">
-                        <label class="form-check-label text-white" for="marketingCurrUSD">
+                        <label class="form-check-label text-white w-100" for="marketingCurrUSD">
                           بالدولار الأمريكي ($)
                         </label>
                       </div>
@@ -809,16 +828,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- Submit Buttons -->
-              <div class="d-flex gap-3">
-                <button type="button" class="btn btn-emerald px-4 py-2" id="saveBusinessBtn">
-                  <i class="bi bi-check-circle-fill"></i> حفظ المشروع واعتماد الحسابات
-                </button>
-                <button type="button" class="btn btn-dark-subtle px-3" onclick="ui.navigateTo('businesses')">
-                  إلغاء
-                </button>
               </div>
 
             </div>
@@ -867,6 +876,16 @@
                   <i class="bi bi-shield-check text-success"></i>
                   تُستخدم تكلفة القطعة كأساس دقيق لحساب تكلفة البضاعة المباعة (COGS) لضمان عدم ازدواجية الأرباح.
                 </div>
+
+                <!-- Submit Buttons inside Live Summary Column -->
+                <div class="d-flex flex-column gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                  <button type="button" class="btn btn-emerald w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" id="saveBusinessBtn">
+                    <i class="bi bi-check-circle-fill"></i> حفظ المشروع واعتماد الحسابات
+                  </button>
+                  <button type="button" class="btn btn-dark-subtle w-100 py-2" onclick="ui.navigateTo('businesses')">
+                    إلغاء
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -877,7 +896,7 @@
            4. إدارة المبيعات (SALES MANAGEMENT)
            =================================================================== -->
       <section id="section-sales" class="spa-section">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 section-header-wrap">
           <div>
             <h4 class="fw-bold text-white mb-1">إدارة ومتابعة المبيعات</h4>
             <p class="text-muted small mb-0">تسجيل الفواتير، متابعة الدفعات النقدية والآجلة، والخصم المباشر من المخزون</p>
@@ -889,8 +908,8 @@
         </div>
 
         <!-- Sales Filters -->
-        <div class="custom-card mb-4 p-3">
-          <div class="row g-3 align-items-center">
+        <div class="custom-card mb-4 p-3 filter-card-custom">
+          <div class="row g-2 g-md-3 align-items-center">
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text bg-dark text-muted"><i class="bi bi-search"></i></span>
@@ -948,7 +967,7 @@
            5. إدارة المصروفات (EXPENSES MANAGEMENT)
            =================================================================== -->
       <section id="section-expenses" class="spa-section">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 section-header-wrap">
           <div>
             <h4 class="fw-bold text-white mb-1">سجل المصروفات التشغيلية</h4>
             <p class="text-muted small mb-0">تتبع مصاريف الحملات الإعلانية، الشحن المحلي، التغليف ومصاريف التشغيل</p>
@@ -960,8 +979,8 @@
         </div>
 
         <!-- Expenses Filters -->
-        <div class="custom-card mb-4 p-3">
-          <div class="row g-3 align-items-center">
+        <div class="custom-card mb-4 p-3 filter-card-custom">
+          <div class="row g-2 g-md-3 align-items-center">
             <div class="col-md-4">
               <select class="form-select" id="expenseFilterBusiness">
                 <option value="all">كل المشاريع والمصروفات العامة</option>
@@ -979,8 +998,11 @@
                 <option value="other">مصروفات أخرى</option>
               </select>
             </div>
-            <div class="col-md-4 text-md-end text-muted small">
-              إجمالي المصروفات المعروضة: <span class="fw-bold text-white fs-6" id="totalFilteredExpenses">0.00 د.ل</span>
+            <div class="col-md-4">
+              <div class="expenses-filter-total-badge text-center text-md-end">
+                <span class="text-muted small">المصروفات المعروضة:</span>
+                <span class="fw-bold text-warning ms-1" id="totalFilteredExpenses">0.00 د.ل</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1015,17 +1037,17 @@
            6. التقارير المالية والتحليل (FINANCIAL REPORTS)
            =================================================================== -->
       <section id="section-reports" class="spa-section">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 section-header-wrap">
           <div>
             <h4 class="fw-bold text-white mb-1">التقارير المالية والتحليل المحاسبي</h4>
             <p class="text-muted small mb-0">كشف حساب شامل لجميع البزنسات ونسب الربحية وحركة السيولة والديون</p>
           </div>
-          <div class="d-flex gap-2 no-print">
-            <button class="btn btn-outline-emerald" onclick="window.print()">
+          <div class="d-flex gap-2 no-print reports-actions-wrap">
+            <button class="btn btn-outline-emerald btn-sm" onclick="window.print()">
               <i class="bi bi-printer-fill"></i> طباعة التقرير الشامل
             </button>
-            <button class="btn btn-dark-subtle" id="exportCsvBtn">
-              <i class="bi bi-file-earmark-spreadsheet-fill"></i> تصدير البيانات (CSV)
+            <button class="btn btn-dark-subtle btn-sm" id="exportCsvBtn">
+              <i class="bi bi-file-earmark-spreadsheet-fill"></i> تصدير (CSV)
             </button>
           </div>
         </div>
@@ -1860,11 +1882,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <!-- Modular Application Scripts -->
-<script src="js/firebase-config.js?v=3.3"></script>
-<script src="js/store.js?v=3.3"></script>
-<script src="js/firebase-service.js?v=3.3"></script>
-<script src="js/ui.js?v=3.3"></script>
-<script src="js/app.js?v=3.3"></script>
+<script src="js/firebase-config.js?v=3.5"></script>
+<script src="js/store.js?v=3.5"></script>
+<script src="js/firebase-service.js?v=3.5"></script>
+<script src="js/ui.js?v=3.5"></script>
+<script src="js/app.js?v=3.5"></script>
 
 <!-- Progressive Web App (PWA) Service Worker & Installation Logic -->
 <script>

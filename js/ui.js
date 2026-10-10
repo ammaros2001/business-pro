@@ -387,34 +387,42 @@ class UIManager {
       const cogsData = monthsOrder.map(k => monthly[k].cogs);
       const profitData = monthsOrder.map(k => monthly[k].profit);
 
+      const isMobile = window.innerWidth < 768;
+
       this.salesChart = new Chart(ctx, {
         type: 'bar',
         data: {
           labels,
           datasets: [
             {
-              label: 'المبيعات (د.ل)',
+              label: isMobile ? 'المبيعات' : 'المبيعات (د.ل)',
               data: salesData,
               backgroundColor: 'rgba(16, 185, 129, 0.7)',
               borderColor: '#10b981',
               borderWidth: 1,
-              borderRadius: 6
+              borderRadius: isMobile ? 3 : 6,
+              barPercentage: isMobile ? 0.9 : 0.8,
+              categoryPercentage: isMobile ? 0.85 : 0.8
             },
             {
-              label: 'تكلفة البضاعة COGS (د.ل)',
+              label: isMobile ? 'COGS' : 'تكلفة البضاعة COGS (د.ل)',
               data: cogsData,
               backgroundColor: 'rgba(6, 182, 212, 0.6)',
               borderColor: '#06b6d4',
               borderWidth: 1,
-              borderRadius: 6
+              borderRadius: isMobile ? 3 : 6,
+              barPercentage: isMobile ? 0.9 : 0.8,
+              categoryPercentage: isMobile ? 0.85 : 0.8
             },
             {
-              label: 'صافي الربح (د.ل)',
+              label: isMobile ? 'الربح' : 'صافي الربح (د.ل)',
               data: profitData,
               backgroundColor: 'rgba(0, 255, 136, 0.9)',
               borderColor: '#00ff88',
               borderWidth: 1,
-              borderRadius: 6
+              borderRadius: isMobile ? 3 : 6,
+              barPercentage: isMobile ? 0.9 : 0.8,
+              categoryPercentage: isMobile ? 0.85 : 0.8
             }
           ]
         },
@@ -423,16 +431,30 @@ class UIManager {
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              labels: { color: '#94a3b8', font: { family: 'Cairo' } }
+              position: 'top',
+              labels: { 
+                color: '#94a3b8', 
+                font: { family: 'Cairo', size: isMobile ? 9 : 12 },
+                boxWidth: isMobile ? 8 : 12,
+                padding: isMobile ? 6 : 10
+              }
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8', font: { family: 'Cairo' } },
+              ticks: { 
+                color: '#94a3b8', 
+                font: { family: 'Cairo', size: isMobile ? 9 : 11 },
+                maxRotation: isMobile ? 35 : 0
+              },
               grid: { color: 'rgba(255, 255, 255, 0.05)' }
             },
             y: {
-              ticks: { color: '#94a3b8', font: { family: 'Cairo' } },
+              ticks: { 
+                color: '#94a3b8', 
+                font: { family: 'Cairo', size: isMobile ? 9 : 11 },
+                callback: (val) => isMobile && val >= 1000 ? `${(val/1000).toFixed(0)}k` : val
+              },
               grid: { color: 'rgba(255, 255, 255, 0.05)' }
             }
           }
@@ -509,6 +531,8 @@ class UIManager {
         backgroundColor = ['rgba(255, 255, 255, 0.08)'];
       }
 
+      const isMobile = window.innerWidth < 768;
+
       this.expensesChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -523,10 +547,16 @@ class UIManager {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          cutout: '62%',
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: '#94a3b8', font: { family: 'Cairo', size: 11 }, boxWidth: 12 }
+              labels: { 
+                color: '#94a3b8', 
+                font: { family: 'Cairo', size: isMobile ? 9 : 11 }, 
+                boxWidth: isMobile ? 8 : 12,
+                padding: isMobile ? 5 : 8
+              }
             },
             tooltip: {
               callbacks: {

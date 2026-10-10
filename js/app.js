@@ -285,6 +285,12 @@ class AppController {
     document.getElementById('summaryMarketingCost').textContent = `${ui.formatMoney(calc.marketingCostLYD)} د.ل`;
     document.getElementById('summaryTotalCapital').textContent = `${ui.formatMoney(calc.totalCapital)} د.ل`;
     document.getElementById('summaryUnitCost').textContent = `${ui.formatMoney(calc.unitCost)} د.ل`;
+
+    // Update Mobile Sticky Quick Calculation Pill
+    const mobUnitCost = document.getElementById('mobileSummaryUnitCost');
+    if (mobUnitCost) mobUnitCost.textContent = `${ui.formatMoney(calc.unitCost)} د.ل`;
+    const mobCapital = document.getElementById('mobileSummaryTotalCapital');
+    if (mobCapital) mobCapital.textContent = `${ui.formatMoney(calc.totalCapital)} د.ل`;
   }
 
   handleSaveBusiness() {
