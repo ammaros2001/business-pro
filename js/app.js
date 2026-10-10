@@ -392,8 +392,6 @@ class AppController {
     const saleQty = document.getElementById('saleQuantity');
     const salePrice = document.getElementById('saleUnitPrice');
     const saleDisc = document.getElementById('saleDiscount');
-    const saleExp = document.getElementById('saleDirectExpenses');
-    const salePaid = document.getElementById('salePaidAmount');
 
     const updateStockNotice = () => {
       const bizId = saleBiz.value;
@@ -415,7 +413,7 @@ class AppController {
       this.recalculateSaleModal();
     });
 
-    [saleQty, salePrice, saleDisc, saleExp, salePaid].forEach(el => {
+    [saleQty, salePrice, saleDisc].forEach(el => {
       if (el) el.addEventListener('input', () => this.recalculateSaleModal());
     });
 
@@ -437,10 +435,8 @@ class AppController {
     const qty = parseInt(document.getElementById('saleQuantity').value, 10) || 0;
     const price = parseFloat(document.getElementById('saleUnitPrice').value) || 0;
     const disc = parseFloat(document.getElementById('saleDiscount').value) || 0;
-    const exp = parseFloat(document.getElementById('saleDirectExpenses').value) || 0;
-    const paid = document.getElementById('salePaidAmount').value;
 
-    const calc = store.calculateSaleAmounts(bizId, qty, price, disc, exp, paid === '' ? null : paid);
+    const calc = store.calculateSaleAmounts(bizId, qty, price, disc, 0, null);
 
     document.getElementById('saleCalcTotal').textContent = `${ui.formatMoney(calc.totalAmount)} د.ل`;
     document.getElementById('saleCalcCogs').textContent = `${ui.formatMoney(calc.cogs)} د.ل`;
@@ -479,8 +475,8 @@ class AppController {
         quantity: qty,
         unitPrice: unitPrice,
         discount: parseFloat(document.getElementById('saleDiscount').value) || 0,
-        sellingExpenses: parseFloat(document.getElementById('saleDirectExpenses').value) || 0,
-        paidAmount: document.getElementById('salePaidAmount').value === '' ? null : parseFloat(document.getElementById('salePaidAmount').value),
+        sellingExpenses: 0,
+        paidAmount: null,
         notes: document.getElementById('saleNotes').value
       };
 
