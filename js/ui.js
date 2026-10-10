@@ -210,6 +210,15 @@ class UIManager {
 
     document.getElementById('kpiTotalExpenses').textContent = this.formatMoney(stats.totalExpenses);
 
+    const mktEl = document.getElementById('kpiMarketingCost');
+    if (mktEl) mktEl.textContent = `${this.formatMoney(stats.totalMarketingCost)} د.ل`;
+
+    const otherEl = document.getElementById('kpiOtherExpenses');
+    if (otherEl) {
+      const otherExp = Math.max(0, stats.totalExpenses - (stats.totalMarketingCost || 0));
+      otherEl.textContent = `${this.formatMoney(otherExp)} د.ل`;
+    }
+
     // Net Profit & Profit Margin Indicator
     const profitEl = document.getElementById('kpiNetProfit');
     const profitContainer = document.getElementById('kpiNetProfitContainer');

@@ -113,7 +113,7 @@ class DataStore {
       extraCostsTotal = data.extraCosts.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
     }
 
-    // 4. تكاليف الإعلانات التأسيسية (تُسجل كمصروف تشغيلي للمشروع)
+    // 4. تكاليف الإعلانات التأسيسية
     let marketingCostLYD = 0;
     if (data.enableMarketing) {
       if (data.marketingCurrencyMode === 'usd') {
@@ -125,10 +125,10 @@ class DataStore {
       }
     }
 
-    // 5. إجمالي رأس مال شراء واستيراد البضاعة
-    const totalCapital = purchaseCostLYD + shippingCostLYD + extraCostsTotal;
+    // 5. إجمالي رأس المال المستثمر (شراء + شحن + تكاليف إضافية + إعلانات تأسيسية)
+    const totalCapital = purchaseCostLYD + shippingCostLYD + extraCostsTotal + marketingCostLYD;
 
-    // 6. متوسط تكلفة شراء وتوريد القطعة الواحدة
+    // 6. متوسط تكلفة القطعة الواحدة
     const unitCost = initialQty > 0 ? (totalCapital / initialQty) : 0;
 
     return {
@@ -178,24 +178,6 @@ class DataStore {
       createdAt: new Date().toISOString()
     };
 
-    // مزامنة تكلفة الإعلانات تلقائياً في جدول المصروفات تحت فئة "marketing"
-    if (newBiz.enableMarketing && calc.marketingCostLYD > 0) {
-      this.state.expenses.unshift({
-        id: `exp_mkt_${newBiz.id}`,
-        title: `إعلانات ممولة تأسيسية - ${newBiz.name}`,
-        category: 'marketing',
-        businessId: newBiz.id,
-        businessName: newBiz.name,
-        date: newBiz.purchaseDate || new Date().toISOString().split('T')[0],
-        currency: newBiz.marketingCurrencyMode === 'usd' ? 'USD' : 'LYD',
-        amount: newBiz.marketingCurrencyMode === 'usd' ? newBiz.marketingCostUSD : calc.marketingCostLYD,
-        exchangeRate: newBiz.marketingCurrencyMode === 'usd' ? newBiz.marketingExchangeRate : 1,
-        amountLYD: calc.marketingCostLYD,
-        notes: 'مُسجل تلقائياً من إعلانات المشروع التأسيسية',
-        createdAt: new Date().toISOString()
-      });
-    }
-
     this.state.businesses.unshift(newBiz);
     this.save();
     return newBiz;
@@ -214,25 +196,7 @@ class DataStore {
       updatedAt: new Date().toISOString()
     };
     this.state.businesses[index] = updatedBiz;
-
-    // تحديث أو حذف مصروف الإعلانات التأسيسية المرتبط
     this.state.expenses = this.state.expenses.filter(e => e.id !== `exp_mkt_${id}`);
-    if (updatedBiz.enableMarketing && calc.marketingCostLYD > 0) {
-      this.state.expenses.unshift({
-        id: `exp_mkt_${id}`,
-        title: `إعلانات ممولة تأسيسية - ${updatedBiz.name}`,
-        category: 'marketing',
-        businessId: updatedBiz.id,
-        businessName: updatedBiz.name,
-        date: updatedBiz.purchaseDate || new Date().toISOString().split('T')[0],
-        currency: updatedBiz.marketingCurrencyMode === 'usd' ? 'USD' : 'LYD',
-        amount: updatedBiz.marketingCurrencyMode === 'usd' ? updatedBiz.marketingCostUSD : calc.marketingCostLYD,
-        exchangeRate: updatedBiz.marketingCurrencyMode === 'usd' ? updatedBiz.marketingExchangeRate : 1,
-        amountLYD: calc.marketingCostLYD,
-        notes: 'مُسجل تلقائياً من إعلانات المشروع التأسيسية',
-        createdAt: new Date().toISOString()
-      });
-    }
 
     this.save();
     return this.state.businesses[index];
@@ -572,8 +536,16 @@ class DataStore {
     const totalCOGS = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.cogs) || 0), 0);
     const totalDirectSellingExpenses = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.sellingExpenses) || 0), 0);
 
-    // 5. إجمالي المصروفات التشغيلية الإضافية
+    // 5. المصروفات التشغيلية والتسويقية
+    // تكلفة الإعلانات الممولة (من رأس مال المشاريع + المصروفات المسجلة)
+    const bizMarketingTotal = allBusinesses.reduce((sum, b) => sum + (b.enableMarketing ? (parseFloat(b.marketingCostLYD) || 0) : 0), 0);
+    const expMarketingTotal = this.state.expenses
+      .filter(e => e.category === 'marketing')
+      .reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
+    const totalMarketingCost = bizMarketingTotal + expMarketingTotal;
+
     const totalOperatingExpenses = this.state.expenses.reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
+    // إجمالي المصروفات الكلية (المصروفات التشغيلية + مصاريف البيع المباشرة)
     const totalExpenses = totalOperatingExpenses + totalDirectSellingExpenses;
 
     // 6. صافي الأرباح المحققة:
@@ -599,6 +571,7 @@ class DataStore {
       totalCapital: Math.round(totalCapital * 100) / 100,
       totalSalesRevenue: Math.round(totalSalesRevenue * 100) / 100,
       totalExpenses: Math.round(totalExpenses * 100) / 100,
+      totalMarketingCost: Math.round(totalMarketingCost * 100) / 100,
       netProfit: Math.round(netProfit * 100) / 100,
       profitMargin: Math.round(profitMargin * 10) / 10,
       remainingStockValue: Math.round(remainingStockValue * 100) / 100,
