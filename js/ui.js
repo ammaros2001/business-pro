@@ -601,25 +601,25 @@ class UIManager {
     document.getElementById('modalBizStatsCards').innerHTML = `
       <div class="col-md-3 col-6">
         <div class="p-2 rounded bg-dark border border-secondary text-center">
-          <div class="text-muted small">رأس المال المستثمر</div>
+          <div class="text-white-50 small mb-1">رأس المال المستثمر</div>
           <div class="fw-bold fs-6 text-white">${this.formatMoney(biz.totalCapital)} د.ل</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="p-2 rounded bg-dark border border-secondary text-center">
-          <div class="text-muted small">متوسط تكلفة القطعة</div>
+          <div class="text-white-50 small mb-1">متوسط تكلفة القطعة</div>
           <div class="fw-bold fs-6 text-info">${this.formatMoney(biz.unitCost)} د.ل</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="p-2 rounded bg-dark border border-secondary text-center">
-          <div class="text-muted small">إجمالي المبيعات</div>
+          <div class="text-white-50 small mb-1">إجمالي المبيعات</div>
           <div class="fw-bold fs-6 text-white">${this.formatMoney(metrics.totalSalesRevenue)} د.ل</div>
         </div>
       </div>
       <div class="col-md-3 col-6">
         <div class="p-2 rounded bg-dark border border-secondary text-center">
-          <div class="text-muted small">صافي الربح المحقق</div>
+          <div class="text-white-50 small mb-1">صافي الربح المحقق</div>
           <div class="fw-bold fs-6 ${metrics.realizedNetProfit >= 0 ? 'text-success' : 'text-danger'}">
             ${this.formatMoney(metrics.realizedNetProfit)} د.ل
           </div>
@@ -628,8 +628,15 @@ class UIManager {
     `;
 
     // Stock Ratio
-    document.getElementById('modalStockRatioText').textContent = 
-      `${metrics.soldQuantity} من أصل ${biz.totalQuantity} مباع (${metrics.stockSoldPercent}%) | المتبقي بالمستودع: ${metrics.remainingQuantity} قطعة (بقيمة ${this.formatMoney(metrics.remainingStockValue)} د.ل)`;
+    const modalStockText = document.getElementById('modalStockRatioText');
+    if (modalStockText) {
+      modalStockText.innerHTML = `
+        <span class="text-white fw-bold">${metrics.soldQuantity}</span> من أصل <span class="text-white fw-bold">${biz.totalQuantity}</span> مباع (<span class="text-success fw-bold">${metrics.stockSoldPercent}%</span>) 
+        <span class="text-white-50 mx-1">|</span> 
+        المتبقي بالمستودع: <span class="text-white fw-bold">${metrics.remainingQuantity} قطعة</span> 
+        <span class="text-info font-monospace">(بقيمة ${this.formatMoney(metrics.remainingStockValue)} د.ل)</span>
+      `;
+    }
     document.getElementById('modalStockProgressFill').style.width = `${metrics.stockSoldPercent}%`;
 
     // Business Sales Table

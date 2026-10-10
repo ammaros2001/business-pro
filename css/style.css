@@ -16,9 +16,9 @@
   --primary-green-glow: 0 0 16px rgba(16, 185, 129, 0.35);
   --neon-green: #00ff88;
   
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --text-subtle: #64748b;
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-subtle: #94a3b8;
   
   --border-color: rgba(16, 185, 129, 0.18);
   --border-subtle: rgba(255, 255, 255, 0.08);
@@ -568,9 +568,15 @@ body {
 .stock-progress-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  color: #e2e8f0 !important;
+  margin-bottom: 0.45rem;
+  font-weight: 500;
+}
+
+.stock-progress-labels strong {
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .stock-progress-bar {
@@ -946,6 +952,19 @@ body {
 .btn-emerald:focus,
 .btn-emerald:active {
   color: #ffffff !important;
+}
+
+/* Global text color overrides for deep dark theme */
+.text-muted {
+  color: #cbd5e1 !important;
+}
+
+.text-secondary {
+  color: #94a3b8 !important;
+}
+
+.text-white-50 {
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
 /* Alerts contrast fix */
