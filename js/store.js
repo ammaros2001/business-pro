@@ -113,7 +113,7 @@ class DataStore {
       extraCostsTotal = data.extraCosts.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
     }
 
-    // 4. تكاليف الإعلانات التأسيسية
+    // 4. تكاليف الإعلانات التأسيسية (تُسجل كمصروف تشغيلي للمشروع)
     let marketingCostLYD = 0;
     if (data.enableMarketing) {
       if (data.marketingCurrencyMode === 'usd') {
@@ -125,10 +125,10 @@ class DataStore {
       }
     }
 
-    // 5. إجمالي رأس المال المستثمر
-    const totalCapital = purchaseCostLYD + shippingCostLYD + extraCostsTotal + marketingCostLYD;
+    // 5. إجمالي رأس مال شراء واستيراد البضاعة
+    const totalCapital = purchaseCostLYD + shippingCostLYD + extraCostsTotal;
 
-    // 6. متوسط تكلفة القطعة الواحدة
+    // 6. متوسط تكلفة شراء وتوريد القطعة الواحدة
     const unitCost = initialQty > 0 ? (totalCapital / initialQty) : 0;
 
     return {
@@ -178,6 +178,24 @@ class DataStore {
       createdAt: new Date().toISOString()
     };
 
+    // مزامنة تكلفة الإعلانات تلقائياً في جدول المصروفات تحت فئة "marketing"
+    if (newBiz.enableMarketing && calc.marketingCostLYD > 0) {
+      this.state.expenses.unshift({
+        id: `exp_mkt_${newBiz.id}`,
+        title: `إعلانات ممولة تأسيسية - ${newBiz.name}`,
+        category: 'marketing',
+        businessId: newBiz.id,
+        businessName: newBiz.name,
+        date: newBiz.purchaseDate || new Date().toISOString().split('T')[0],
+        currency: newBiz.marketingCurrencyMode === 'usd' ? 'USD' : 'LYD',
+        amount: newBiz.marketingCurrencyMode === 'usd' ? newBiz.marketingCostUSD : calc.marketingCostLYD,
+        exchangeRate: newBiz.marketingCurrencyMode === 'usd' ? newBiz.marketingExchangeRate : 1,
+        amountLYD: calc.marketingCostLYD,
+        notes: 'مُسجل تلقائياً من إعلانات المشروع التأسيسية',
+        createdAt: new Date().toISOString()
+      });
+    }
+
     this.state.businesses.unshift(newBiz);
     this.save();
     return newBiz;
@@ -188,16 +206,34 @@ class DataStore {
     if (index === -1) return null;
 
     const calc = this.calculateBusinessCapital(updateData);
-    this.state.businesses[index] = {
+    const updatedBiz = {
       ...this.state.businesses[index],
       ...updateData,
       totalCapital: calc.totalCapital,
       unitCost: calc.unitCost,
       updatedAt: new Date().toISOString()
     };
+    this.state.businesses[index] = updatedBiz;
 
-    // Note: If unitCost changes, we can also update COGS for existing sales or keep historical COGS.
-    // In accounting, existing sales keep historical COGS unless recalculated.
+    // تحديث أو حذف مصروف الإعلانات التأسيسية المرتبط
+    this.state.expenses = this.state.expenses.filter(e => e.id !== `exp_mkt_${id}`);
+    if (updatedBiz.enableMarketing && calc.marketingCostLYD > 0) {
+      this.state.expenses.unshift({
+        id: `exp_mkt_${id}`,
+        title: `إعلانات ممولة تأسيسية - ${updatedBiz.name}`,
+        category: 'marketing',
+        businessId: updatedBiz.id,
+        businessName: updatedBiz.name,
+        date: updatedBiz.purchaseDate || new Date().toISOString().split('T')[0],
+        currency: updatedBiz.marketingCurrencyMode === 'usd' ? 'USD' : 'LYD',
+        amount: updatedBiz.marketingCurrencyMode === 'usd' ? updatedBiz.marketingCostUSD : calc.marketingCostLYD,
+        exchangeRate: updatedBiz.marketingCurrencyMode === 'usd' ? updatedBiz.marketingExchangeRate : 1,
+        amountLYD: calc.marketingCostLYD,
+        notes: 'مُسجل تلقائياً من إعلانات المشروع التأسيسية',
+        createdAt: new Date().toISOString()
+      });
+    }
+
     this.save();
     return this.state.businesses[index];
   }
