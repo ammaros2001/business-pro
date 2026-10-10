@@ -189,8 +189,24 @@ class UIManager {
   }
 
   formatMoney(num) {
-    const val = parseFloat(num) || 0;
-    return val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const val = parseFloat(num);
+    if (isNaN(val)) return '0';
+
+    const sign = val < 0 ? '-' : '';
+    const absVal = Math.abs(val);
+
+    // التقريب لأقرب ربع (0, 0.25, 0.5, 0.75) أو رقم صحيح
+    const rounded = Math.round(absVal * 4) / 4;
+    const intPart = Math.floor(rounded);
+    const fracPart = Math.round((rounded - intPart) * 100);
+
+    if (fracPart === 0) {
+      return `${sign}${intPart}`;
+    } else if (fracPart === 50) {
+      return `${sign}${intPart}.5`;
+    } else {
+      return `${sign}${intPart}.${fracPart}`;
+    }
   }
 
   /* ==========================================================================
