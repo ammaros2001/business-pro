@@ -130,11 +130,35 @@ class AppController {
       this.recalculateBusinessLiveSummary();
     });
 
+    // Marketing Currency Switcher
+    const mktLYD = document.getElementById('marketingCurrLYD');
+    const mktUSD = document.getElementById('marketingCurrUSD');
+    const mktLYDGroup = document.getElementById('marketingLYDGroup');
+    const mktUSDGroup = document.getElementById('marketingUSDGroup');
+    const mktUSDRateGroup = document.getElementById('marketingUSDRateGroup');
+
+    const updateMarketingCurrencyUI = () => {
+      if (mktUSD && mktUSD.checked) {
+        mktLYDGroup?.classList.add('d-none');
+        mktUSDGroup?.classList.remove('d-none');
+        mktUSDRateGroup?.classList.remove('d-none');
+      } else {
+        mktLYDGroup?.classList.remove('d-none');
+        mktUSDGroup?.classList.add('d-none');
+        mktUSDRateGroup?.classList.add('d-none');
+      }
+      this.recalculateBusinessLiveSummary();
+    };
+
+    if (mktLYD) mktLYD.addEventListener('change', updateMarketingCurrencyUI);
+    if (mktUSD) mktUSD.addEventListener('change', updateMarketingCurrencyUI);
+
     // Live calculation listeners for all numerical inputs
     const inputIds = [
       'bizTotalQuantity', 'bizPurchasePriceLYD', 'bizPurchasePriceUSD', 'bizExchangeRate',
       'bizSeaCbm', 'bizSeaRatePerCbm', 'bizAirWeightKg', 'bizAirRatePerKg',
-      'bizShippingExchangeRate', 'bizCustomShippingCostManual', 'bizMarketingCostLYD'
+      'bizShippingExchangeRate', 'bizCustomShippingCostManual', 
+      'bizMarketingCostLYD', 'bizMarketingCostUSD', 'bizMarketingExchangeRate'
     ];
 
     inputIds.forEach(id => {
@@ -230,7 +254,10 @@ class AppController {
       customShippingCostManual: document.getElementById('bizCustomShippingCostManual').value,
       extraCosts,
       enableMarketing: document.getElementById('bizEnableMarketing').checked,
-      marketingCostLYD: parseFloat(document.getElementById('bizMarketingCostLYD').value) || 0
+      marketingCurrencyMode: document.getElementById('marketingCurrUSD')?.checked ? 'usd' : 'lyd',
+      marketingCostLYD: parseFloat(document.getElementById('bizMarketingCostLYD').value) || 0,
+      marketingCostUSD: parseFloat(document.getElementById('bizMarketingCostUSD')?.value) || 0,
+      marketingExchangeRate: parseFloat(document.getElementById('bizMarketingExchangeRate')?.value) || 1
     };
   }
 
@@ -238,10 +265,17 @@ class AppController {
     const data = this.collectBusinessFormData();
     const calc = store.calculateBusinessCapital(data);
 
-    // Update USD preview
+    // Update USD preview for purchase price
     if (data.currencyMode === 'usd_lyd') {
       const equiv = data.purchasePriceUSD * data.exchangeRate;
       document.getElementById('equivalentLYDPreview').textContent = `المعادل: ${ui.formatMoney(equiv)} د.ل`;
+    }
+
+    // Update USD preview for marketing
+    if (data.marketingCurrencyMode === 'usd') {
+      const mktEquiv = data.marketingCostUSD * data.marketingExchangeRate;
+      const mktPreview = document.getElementById('marketingEquivalentLYDPreview');
+      if (mktPreview) mktPreview.textContent = `المعادل: ${ui.formatMoney(mktEquiv)} د.ل`;
     }
 
     // Update Live Summary Box
@@ -286,6 +320,8 @@ class AppController {
     document.getElementById('businessFormTitle').textContent = 'إضافة مشروع تجاري جديد';
     document.getElementById('dynamicExtraCostsList').innerHTML = '';
     document.getElementById('marketingCostInputGroup').classList.add('d-none');
+    document.getElementById('marketingCurrLYD').checked = true;
+    document.getElementById('marketingCurrLYD').dispatchEvent(new Event('change'));
     document.getElementById('currModeLYD').checked = true;
     document.getElementById('currModeLYD').dispatchEvent(new Event('change'));
     document.getElementById('shipSea').checked = true;
@@ -355,7 +391,15 @@ class AppController {
     if (biz.enableMarketing) {
       document.getElementById('bizEnableMarketing').checked = true;
       document.getElementById('marketingCostInputGroup').classList.remove('d-none');
-      document.getElementById('bizMarketingCostLYD').value = biz.marketingCostLYD || '';
+      if (biz.marketingCurrencyMode === 'usd') {
+        document.getElementById('marketingCurrUSD').checked = true;
+        document.getElementById('bizMarketingCostUSD').value = biz.marketingCostUSD || '';
+        document.getElementById('bizMarketingExchangeRate').value = biz.marketingExchangeRate || 7.25;
+      } else {
+        document.getElementById('marketingCurrLYD').checked = true;
+        document.getElementById('bizMarketingCostLYD').value = biz.marketingCostLYD || '';
+      }
+      document.getElementById('marketingCurrLYD').dispatchEvent(new Event('change'));
     }
 
     this.recalculateBusinessLiveSummary();

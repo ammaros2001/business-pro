@@ -116,7 +116,13 @@ class DataStore {
     // 4. تكاليف الإعلانات التأسيسية
     let marketingCostLYD = 0;
     if (data.enableMarketing) {
-      marketingCostLYD = parseFloat(data.marketingCostLYD) || 0;
+      if (data.marketingCurrencyMode === 'usd') {
+        const costUSD = parseFloat(data.marketingCostUSD) || 0;
+        const mRate = parseFloat(data.marketingExchangeRate) || 1;
+        marketingCostLYD = costUSD * mRate;
+      } else {
+        marketingCostLYD = parseFloat(data.marketingCostLYD) || 0;
+      }
     }
 
     // 5. إجمالي رأس المال المستثمر
@@ -161,7 +167,10 @@ class DataStore {
       customShippingCostManual: bizData.customShippingCostManual || null,
       extraCosts: Array.isArray(bizData.extraCosts) ? bizData.extraCosts : [],
       enableMarketing: !!bizData.enableMarketing,
-      marketingCostLYD: bizData.marketingCostLYD || 0,
+      marketingCurrencyMode: bizData.marketingCurrencyMode || 'lyd',
+      marketingCostLYD: calc.marketingCostLYD,
+      marketingCostUSD: bizData.marketingCostUSD || 0,
+      marketingExchangeRate: bizData.marketingExchangeRate || 1,
       // Calculated Fields
       totalCapital: calc.totalCapital,
       unitCost: calc.unitCost,
