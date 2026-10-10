@@ -253,7 +253,7 @@ class AppController {
       airRatePerKg: parseFloat(document.getElementById('bizAirRatePerKg').value) || 0,
       customShippingCostManual: document.getElementById('bizCustomShippingCostManual').value,
       extraCosts,
-      enableMarketing: document.getElementById('bizEnableMarketing').checked,
+      enableMarketing: document.getElementById('bizEnableMarketing').checked || (parseFloat(document.getElementById('bizMarketingCostLYD').value) || 0) > 0 || (parseFloat(document.getElementById('bizMarketingCostUSD')?.value) || 0) > 0,
       marketingCurrencyMode: document.getElementById('marketingCurrUSD')?.checked ? 'usd' : 'lyd',
       marketingCostLYD: parseFloat(document.getElementById('bizMarketingCostLYD').value) || 0,
       marketingCostUSD: parseFloat(document.getElementById('bizMarketingCostUSD')?.value) || 0,
@@ -388,16 +388,17 @@ class AppController {
     }
 
     // Marketing
-    if (biz.enableMarketing) {
+    const mktCost = store.getBusinessMarketingCost(biz);
+    if (biz.enableMarketing || mktCost > 0 || (parseFloat(biz.marketingCostUSD) || 0) > 0) {
       document.getElementById('bizEnableMarketing').checked = true;
       document.getElementById('marketingCostInputGroup').classList.remove('d-none');
-      if (biz.marketingCurrencyMode === 'usd') {
+      if (biz.marketingCurrencyMode === 'usd' || (!biz.marketingCostLYD && (parseFloat(biz.marketingCostUSD) || 0) > 0)) {
         document.getElementById('marketingCurrUSD').checked = true;
         document.getElementById('bizMarketingCostUSD').value = biz.marketingCostUSD || '';
         document.getElementById('bizMarketingExchangeRate').value = biz.marketingExchangeRate || 7.25;
       } else {
         document.getElementById('marketingCurrLYD').checked = true;
-        document.getElementById('bizMarketingCostLYD').value = biz.marketingCostLYD || '';
+        document.getElementById('bizMarketingCostLYD').value = biz.marketingCostLYD || mktCost || '';
       }
       document.getElementById('marketingCurrLYD').dispatchEvent(new Event('change'));
     }

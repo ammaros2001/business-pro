@@ -414,7 +414,9 @@ class UIManager {
 
       // 1. حساب المصروفات التشغيلية المسجلة
       store.state.expenses.forEach(e => {
-        const cat = e.category || 'other';
+        const title = (e.title || '').toLowerCase().trim();
+        const isMarketing = e.category === 'marketing' || /اعلان|إعلان|تسويق|ترويج|ممول|marketing|ads?|sponsor|سبونسر/.test(title);
+        const cat = isMarketing ? 'marketing' : (e.category || 'other');
         if (catMap[cat]) {
           catMap[cat].total += (parseFloat(e.amountLYD) || 0);
         } else {
@@ -422,10 +424,11 @@ class UIManager {
         }
       });
 
-      // 2. إضافة تكاليف الإعلانات الممولة للمشاريع
+      // 2. إضافة تكاليف الإعلانات الممولة لكافة المشاريع
       store.state.businesses.forEach(b => {
-        if (b.enableMarketing && (parseFloat(b.marketingCostLYD) || 0) > 0) {
-          catMap.marketing.total += (parseFloat(b.marketingCostLYD) || 0);
+        const mktCost = store.getBusinessMarketingCost(b);
+        if (mktCost > 0) {
+          catMap.marketing.total += mktCost;
         }
       });
 

@@ -35,6 +35,22 @@ class DataStore {
     } else {
       this.seedDemoData();
     }
+    this.syncBusinessesState();
+  }
+
+  syncBusinessesState() {
+    if (!Array.isArray(this.state.businesses)) return;
+    this.state.businesses.forEach(biz => {
+      // إذا كانت تكلفة الإعلانات بالدولار مسجلة ولكن بالدينار صفر أو فارغة
+      if ((!biz.marketingCostLYD || biz.marketingCostLYD === 0) && (parseFloat(biz.marketingCostUSD) || 0) > 0) {
+        const rate = parseFloat(biz.marketingExchangeRate) || parseFloat(biz.exchangeRate) || 1;
+        biz.marketingCostLYD = Math.round((parseFloat(biz.marketingCostUSD) * rate) * 100) / 100;
+        biz.enableMarketing = true;
+      }
+      if ((parseFloat(biz.marketingCostLYD) || 0) > 0) {
+        biz.enableMarketing = true;
+      }
+    });
   }
 
   save() {
@@ -115,10 +131,11 @@ class DataStore {
 
     // 4. تكاليف الإعلانات التأسيسية
     let marketingCostLYD = 0;
-    if (data.enableMarketing) {
-      if (data.marketingCurrencyMode === 'usd') {
+    const hasMarketingInput = data.enableMarketing || (parseFloat(data.marketingCostLYD) || 0) > 0 || (parseFloat(data.marketingCostUSD) || 0) > 0;
+    if (hasMarketingInput) {
+      if (data.marketingCurrencyMode === 'usd' || (!data.marketingCostLYD && (parseFloat(data.marketingCostUSD) || 0) > 0)) {
         const costUSD = parseFloat(data.marketingCostUSD) || 0;
-        const mRate = parseFloat(data.marketingExchangeRate) || 1;
+        const mRate = parseFloat(data.marketingExchangeRate) || parseFloat(data.exchangeRate) || 1;
         marketingCostLYD = costUSD * mRate;
       } else {
         marketingCostLYD = parseFloat(data.marketingCostLYD) || 0;
@@ -166,7 +183,7 @@ class DataStore {
       airRatePerKg: bizData.airRatePerKg || 0,
       customShippingCostManual: bizData.customShippingCostManual || null,
       extraCosts: Array.isArray(bizData.extraCosts) ? bizData.extraCosts : [],
-      enableMarketing: !!bizData.enableMarketing,
+      enableMarketing: !!(bizData.enableMarketing || calc.marketingCostLYD > 0),
       marketingCurrencyMode: bizData.marketingCurrencyMode || 'lyd',
       marketingCostLYD: calc.marketingCostLYD,
       marketingCostUSD: bizData.marketingCostUSD || 0,
@@ -191,6 +208,8 @@ class DataStore {
     const updatedBiz = {
       ...this.state.businesses[index],
       ...updateData,
+      enableMarketing: !!(updateData.enableMarketing || calc.marketingCostLYD > 0),
+      marketingCostLYD: calc.marketingCostLYD,
       totalCapital: calc.totalCapital,
       unitCost: calc.unitCost,
       updatedAt: new Date().toISOString()
@@ -200,6 +219,39 @@ class DataStore {
 
     this.save();
     return this.state.businesses[index];
+  }
+
+  /**
+   * حساب إجمالي تكلفة الإعلانات الممولة للمشروع من كافة مصادرها
+   */
+  getBusinessMarketingCost(biz) {
+    if (!biz) return 0;
+    let total = 0;
+
+    // 1. القيمة المحددة في حقول الإعلانات الممولة للمشروع (سواء دينار أو دولار)
+    let directMarketing = 0;
+    const isUSD = biz.marketingCurrencyMode === 'usd' || (!biz.marketingCostLYD && (parseFloat(biz.marketingCostUSD) || 0) > 0);
+    if (isUSD) {
+      const usd = parseFloat(biz.marketingCostUSD) || 0;
+      const rate = parseFloat(biz.marketingExchangeRate) || parseFloat(biz.exchangeRate) || 1;
+      directMarketing = usd * rate;
+    } else {
+      directMarketing = parseFloat(biz.marketingCostLYD) || 0;
+    }
+    total += directMarketing;
+
+    // 2. فحص بنود التكاليف الإضافية في المشروع إن وُجد بند باسم إعلان أو تسويق ممول
+    if (Array.isArray(biz.extraCosts)) {
+      biz.extraCosts.forEach(item => {
+        const name = (item.name || '').toLowerCase().trim();
+        const isMkt = /اعلان|إعلان|تسويق|ترويج|ممول|marketing|ads?|sponsor|سبونسر|فيس|تيك|سناب|انستا/.test(name);
+        if (isMkt) {
+          total += (parseFloat(item.amount) || 0);
+        }
+      });
+    }
+
+    return Math.round(total * 100) / 100;
   }
 
   archiveBusiness(id) {
@@ -519,6 +571,7 @@ class DataStore {
      ========================================================================== */
 
   getGlobalDashboardStats() {
+    this.syncBusinessesState();
     const activeBusinesses = this.state.businesses.filter(b => b.status === 'active');
     
     // 1. حساب رأس المال الإجمالي لجميع المشاريع المسجلة
@@ -537,11 +590,16 @@ class DataStore {
     const totalDirectSellingExpenses = this.state.sales.reduce((sum, s) => sum + (parseFloat(s.sellingExpenses) || 0), 0);
 
     // 5. المصروفات التشغيلية والتسويقية
-    // تكلفة الإعلانات الممولة من المشاريع المسجلة
-    const bizMarketingTotal = allBusinesses.reduce((sum, b) => sum + (b.enableMarketing ? (parseFloat(b.marketingCostLYD) || 0) : 0), 0);
+    // تكلفة الإعلانات الممولة من كافة المشاريع المسجلة (من الحقول المخصصة والتكاليف الإضافية المعنونة كإعلانات)
+    const bizMarketingTotal = allBusinesses.reduce((sum, b) => sum + this.getBusinessMarketingCost(b), 0);
+
     // تكلفة الإعلانات من المصروفات التشغيلية العامة المسجلة
     const expMarketingTotal = this.state.expenses
-      .filter(e => e.category === 'marketing')
+      .filter(e => {
+        if (e.category === 'marketing') return true;
+        const title = (e.title || '').toLowerCase().trim();
+        return /اعلان|إعلان|تسويق|ترويج|ممول|marketing|ads?|sponsor|سبونسر/.test(title);
+      })
       .reduce((sum, e) => sum + (parseFloat(e.amountLYD) || 0), 0);
     const totalMarketingCost = bizMarketingTotal + expMarketingTotal;
 
