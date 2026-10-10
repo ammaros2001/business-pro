@@ -431,58 +431,73 @@ class AppController {
   }
 
   recalculateSaleModal() {
-    const bizId = document.getElementById('saleBusinessSelect').value;
-    const qty = parseInt(document.getElementById('saleQuantity').value, 10) || 0;
-    const price = parseFloat(document.getElementById('saleUnitPrice').value) || 0;
-    const disc = parseFloat(document.getElementById('saleDiscount').value) || 0;
+    const bizSelect = document.getElementById('saleBusinessSelect');
+    const bizId = bizSelect ? bizSelect.value : '';
+    const qty = parseInt(document.getElementById('saleQuantity')?.value, 10) || 0;
+    const price = parseFloat(document.getElementById('saleUnitPrice')?.value) || 0;
+    const disc = parseFloat(document.getElementById('saleDiscount')?.value) || 0;
 
     const calc = store.calculateSaleAmounts(bizId, qty, price, disc, 0, null);
 
-    document.getElementById('saleCalcTotal').textContent = `${ui.formatMoney(calc.totalAmount)} د.ل`;
-    document.getElementById('saleCalcCogs').textContent = `${ui.formatMoney(calc.cogs)} د.ل`;
-    document.getElementById('saleCalcProfit').textContent = `${ui.formatMoney(calc.netProfit)} د.ل`;
-    document.getElementById('saleCalcRemaining').textContent = `المتبقي: ${ui.formatMoney(calc.remainingAmount)} د.ل`;
+    const totalEl = document.getElementById('saleCalcTotal');
+    if (totalEl) totalEl.textContent = `${ui.formatMoney(calc.totalAmount)} د.ل`;
+    const cogsEl = document.getElementById('saleCalcCogs');
+    if (cogsEl) cogsEl.textContent = `${ui.formatMoney(calc.cogs)} د.ل`;
+    const profitEl = document.getElementById('saleCalcProfit');
+    if (profitEl) profitEl.textContent = `${ui.formatMoney(calc.netProfit)} د.ل`;
+    const remEl = document.getElementById('saleCalcRemaining');
+    if (remEl) remEl.textContent = `المتبقي: ${ui.formatMoney(calc.remainingAmount)} د.ل`;
 
     const badge = document.getElementById('saleCalcStatusBadge');
-    if (calc.paymentStatus === 'paid') {
-      badge.className = 'badge badge-paid-full';
-      badge.textContent = 'مدفوع بالكامل';
-    } else if (calc.paymentStatus === 'partial') {
-      badge.className = 'badge badge-paid-partial';
-      badge.textContent = 'دفع جزئي';
-    } else {
-      badge.className = 'badge badge-paid-debt';
-      badge.textContent = 'غير مدفوع (بالأجل)';
+    if (badge) {
+      if (calc.paymentStatus === 'paid') {
+        badge.className = 'badge badge-paid-full';
+        badge.textContent = 'مدفوع بالكامل';
+      } else if (calc.paymentStatus === 'partial') {
+        badge.className = 'badge badge-paid-partial';
+        badge.textContent = 'دفع جزئي';
+      } else {
+        badge.className = 'badge badge-paid-debt';
+        badge.textContent = 'غير مدفوع (بالأجل)';
+      }
     }
   }
 
   handleSaveSale() {
     try {
-      const bizId = document.getElementById('saleBusinessSelect').value;
+      const bizSelect = document.getElementById('saleBusinessSelect');
+      const bizId = bizSelect ? bizSelect.value : '';
       if (!bizId) throw new Error('يرجى اختيار المشروع أولاً.');
 
-      const qty = parseInt(document.getElementById('saleQuantity').value, 10);
-      const unitPrice = parseFloat(document.getElementById('saleUnitPrice').value);
+      const qty = parseInt(document.getElementById('saleQuantity')?.value, 10);
+      const unitPrice = parseFloat(document.getElementById('saleUnitPrice')?.value);
 
       if (!qty || qty <= 0) throw new Error('يرجى تحديد كمية بيع صحيحة.');
       if (isNaN(unitPrice) || unitPrice < 0) throw new Error('يرجى تحديد سعر بيع صحيح.');
 
+      const customerName = document.getElementById('saleCustomerName')?.value?.trim() || 'زبون عام';
+      const customerPhone = document.getElementById('saleCustomerPhone')?.value?.trim() || '';
+      const saleDate = document.getElementById('saleDate')?.value || new Date().toISOString().split('T')[0];
+      const discount = parseFloat(document.getElementById('saleDiscount')?.value) || 0;
+      const notes = document.getElementById('saleNotes')?.value || '';
+
       const saleData = {
         businessId: bizId,
-        customerName: document.getElementById('saleCustomerName').value,
-        customerPhone: document.getElementById('saleCustomerPhone').value,
-        saleDate: document.getElementById('saleDate').value || new Date().toISOString().split('T')[0],
+        customerName: customerName,
+        customerPhone: customerPhone,
+        saleDate: saleDate,
         quantity: qty,
         unitPrice: unitPrice,
-        discount: parseFloat(document.getElementById('saleDiscount').value) || 0,
+        discount: discount,
         sellingExpenses: 0,
         paidAmount: null,
-        notes: document.getElementById('saleNotes').value
+        notes: notes
       };
 
       const newSale = store.addSale(saleData);
       ui.saleModal.hide();
-      document.getElementById('saleForm').reset();
+      const saleForm = document.getElementById('saleForm');
+      if (saleForm) saleForm.reset();
       ui.showToast(`تم تسجيل الفاتورة (${newSale.invoiceNo}) وخصم ${newSale.quantity} قطعة من المخزون بنجاح!`, 'success');
     } catch (err) {
       ui.showToast(err.message, 'error');
