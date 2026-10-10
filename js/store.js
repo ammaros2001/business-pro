@@ -386,6 +386,67 @@ class DataStore {
     return newSale;
   }
 
+  updateSale(saleId, saleData) {
+    const saleIndex = this.state.sales.findIndex(s => s.id === saleId);
+    if (saleIndex === -1) {
+      throw new Error('عملية البيع غير موجودة.');
+    }
+    const oldSale = this.state.sales[saleIndex];
+    const biz = this.getBusinessById(saleData.businessId);
+    if (!biz) {
+      throw new Error('البزنس المحدد غير موجود.');
+    }
+
+    const metrics = this.getBusinessMetrics(saleData.businessId);
+    const requestedQty = parseInt(saleData.quantity, 10) || 0;
+    if (requestedQty <= 0) {
+      throw new Error('يرجى تحديد كمية بيع صحيحة أكبر من الصفر.');
+    }
+
+    // Available stock including the quantity from the sale being updated
+    const oldQtyForSameBiz = oldSale.businessId === saleData.businessId ? (parseInt(oldSale.quantity, 10) || 0) : 0;
+    const maxAvailable = metrics.remainingQuantity + oldQtyForSameBiz;
+    if (requestedQty > maxAvailable) {
+      throw new Error(`الكمية المطلوبة (${requestedQty}) تتجاوز المخزون المتاح (${maxAvailable} قطعة).`);
+    }
+
+    const calc = this.calculateSaleAmounts(
+      saleData.businessId,
+      requestedQty,
+      saleData.unitPrice,
+      saleData.discount,
+      saleData.sellingExpenses,
+      saleData.paidAmount
+    );
+
+    const updatedSale = {
+      ...oldSale,
+      businessId: saleData.businessId,
+      businessName: biz.name,
+      productName: biz.productName,
+      customerName: (saleData.customerName || 'زبون عام').trim(),
+      customerPhone: (saleData.customerPhone || '').trim(),
+      saleDate: saleData.saleDate || oldSale.saleDate,
+      quantity: requestedQty,
+      unitPrice: parseFloat(saleData.unitPrice) || 0,
+      discount: parseFloat(saleData.discount) || 0,
+      sellingExpenses: calc.sellingExpenses,
+      subtotal: calc.subtotal,
+      totalAmount: calc.totalAmount,
+      cogs: calc.cogs,
+      netProfit: calc.netProfit,
+      paidAmount: calc.paidAmount,
+      remainingAmount: calc.remainingAmount,
+      paymentStatus: calc.paymentStatus,
+      notes: saleData.notes || '',
+      updatedAt: new Date().toISOString()
+    };
+
+    this.state.sales[saleIndex] = updatedSale;
+    this.save();
+    return updatedSale;
+  }
+
   recordPayment(saleId, paymentAmount) {
     const sale = this.state.sales.find(s => s.id === saleId);
     if (!sale) return null;

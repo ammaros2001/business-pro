@@ -666,22 +666,40 @@ class UIManager {
     }
     document.getElementById('modalStockProgressFill').style.width = `${metrics.stockSoldPercent}%`;
 
-    // Business Sales Table
-    const sales = store.state.sales.filter(s => s.businessId === bizId);
+    // Business Sales Table (مرتبة من الإدخال الأول إلى الأخير مع الترقيم المتسلسل)
+    const bizSales = store.state.sales
+      .filter(s => s.businessId === bizId)
+      .slice()
+      .sort((a, b) => new Date(a.createdAt || a.saleDate) - new Date(b.createdAt || b.saleDate));
+
     const salesTbody = document.getElementById('modalBizSalesTableBody');
-    if (sales.length === 0) {
-      salesTbody.innerHTML = `<tr><td colspan="8" class="text-center py-3 text-muted">لا توجد مبيعات لهذا المشروع بعد</td></tr>`;
+    if (bizSales.length === 0) {
+      salesTbody.innerHTML = `<tr><td colspan="10" class="text-center py-3 text-muted">لا توجد مبيعات لهذا المشروع بعد</td></tr>`;
     } else {
-      salesTbody.innerHTML = sales.map(s => `
+      salesTbody.innerHTML = bizSales.map((s, index) => `
         <tr>
-          <td><span class="font-monospace text-success">${s.invoiceNo}</span></td>
+          <td><span class="badge bg-secondary font-monospace">${index + 1}</span></td>
+          <td><span class="font-monospace text-success fw-bold">${s.invoiceNo}</span></td>
           <td>${s.saleDate}</td>
           <td>${s.customerName}</td>
-          <td>${s.quantity} قطعة</td>
+          <td><span class="badge bg-dark">${s.quantity} قطعة</span></td>
           <td>${this.formatMoney(s.unitPrice)} د.ل</td>
-          <td class="fw-bold">${this.formatMoney(s.totalAmount)} د.ل</td>
-          <td class="${s.netProfit >= 0 ? 'text-success' : 'text-danger'}">${this.formatMoney(s.netProfit)} د.ل</td>
+          <td class="fw-bold text-white">${this.formatMoney(s.totalAmount)} د.ل</td>
+          <td class="fw-bold ${s.netProfit >= 0 ? 'text-success' : 'text-danger'}">${this.formatMoney(s.netProfit)} د.ل</td>
           <td>${s.paymentStatus === 'paid' ? '<span class="badge badge-paid-full">مدفوع</span>' : (s.paymentStatus === 'partial' ? '<span class="badge badge-paid-partial">جزئي</span>' : '<span class="badge badge-paid-debt">بالأجل</span>')}</td>
+          <td class="text-center">
+            <div class="d-inline-flex gap-1">
+              <button class="btn btn-sm btn-outline-info" onclick="app.editSale('${s.id}')" title="تعديل عملية البيع">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button class="btn btn-sm btn-dark-subtle" onclick="ui.showReceipt('${s.id}')" title="طباعة إيصال">
+                <i class="bi bi-receipt"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="app.deleteSale('${s.id}')" title="حذف عملية البيع">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
         </tr>
       `).join('');
     }
@@ -816,6 +834,9 @@ class UIManager {
                   <i class="bi bi-cash"></i>
                 </button>
               ` : ''}
+              <button class="btn btn-sm btn-outline-info" onclick="app.editSale('${sale.id}')" title="تعديل">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
               <button class="btn btn-sm btn-dark-subtle" onclick="ui.showReceipt('${sale.id}')" title="طباعة إيصال">
                 <i class="bi bi-receipt"></i>
               </button>

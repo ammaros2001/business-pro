@@ -417,10 +417,16 @@ class AppController {
   setupSalesEvents() {
     // Open modal buttons
     const openBtn = document.getElementById('openAddSaleModalBtn');
-    if (openBtn) openBtn.addEventListener('click', () => ui.saleModal.show());
+    if (openBtn) openBtn.addEventListener('click', () => {
+      this.resetSaleModal();
+      ui.saleModal.show();
+    });
 
     const quickBtn = document.getElementById('quickAddSaleBtn');
-    if (quickBtn) quickBtn.addEventListener('click', () => ui.saleModal.show());
+    if (quickBtn) quickBtn.addEventListener('click', () => {
+      this.resetSaleModal();
+      ui.saleModal.show();
+    });
 
     // Filter events
     const searchInp = document.getElementById('salesSearchInput');
@@ -538,14 +544,91 @@ class AppController {
         notes: notes
       };
 
-      const newSale = store.addSale(saleData);
-      ui.saleModal.hide();
-      const saleForm = document.getElementById('saleForm');
-      if (saleForm) saleForm.reset();
-      ui.showToast(`تم تسجيل الفاتورة (${newSale.invoiceNo}) وخصم ${newSale.quantity} قطعة من المخزون بنجاح!`, 'success');
+      const editingId = document.getElementById('editingSaleId')?.value;
+
+      if (editingId) {
+        const updatedSale = store.updateSale(editingId, saleData);
+        ui.saleModal.hide();
+        this.resetSaleModal();
+        ui.showToast(`تم تعديل الفاتورة (${updatedSale.invoiceNo}) وتحديث الحسابات بنجاح!`, 'success');
+      } else {
+        const newSale = store.addSale(saleData);
+        ui.saleModal.hide();
+        this.resetSaleModal();
+        ui.showToast(`تم تسجيل الفاتورة (${newSale.invoiceNo}) وخصم ${newSale.quantity} قطعة من المخزون بنجاح!`, 'success');
+      }
     } catch (err) {
       ui.showToast(err.message, 'error');
     }
+  }
+
+  resetSaleModal() {
+    const saleForm = document.getElementById('saleForm');
+    if (saleForm) saleForm.reset();
+    const editingIdEl = document.getElementById('editingSaleId');
+    if (editingIdEl) editingIdEl.value = '';
+    const titleEl = document.getElementById('saleModalTitle');
+    if (titleEl) {
+      titleEl.innerHTML = '<i class="bi bi-cart-plus text-success me-1"></i> تسجيل عملية بيع جديدة';
+    }
+    const saveBtn = document.getElementById('saveSaleBtn');
+    if (saveBtn) {
+      saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> إتمام وحفظ عملية البيع';
+    }
+    this.recalculateSaleModal();
+  }
+
+  editSale(saleId) {
+    const sale = store.state.sales.find(s => s.id === saleId);
+    if (!sale) {
+      ui.showToast('عملية البيع غير موجودة.', 'error');
+      return;
+    }
+
+    // Set editing ID
+    const editingIdEl = document.getElementById('editingSaleId');
+    if (editingIdEl) editingIdEl.value = sale.id;
+
+    // Update modal title & button
+    const titleEl = document.getElementById('saleModalTitle');
+    if (titleEl) {
+      titleEl.innerHTML = `<i class="bi bi-pencil-square text-warning me-1"></i> تعديل عملية البيع (${sale.invoiceNo})`;
+    }
+    const saveBtn = document.getElementById('saveSaleBtn');
+    if (saveBtn) {
+      saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> حفظ التعديلات';
+    }
+
+    // Fill form inputs
+    const bizSelect = document.getElementById('saleBusinessSelect');
+    if (bizSelect) {
+      bizSelect.value = sale.businessId;
+      bizSelect.dispatchEvent(new Event('change'));
+    }
+
+    const dateEl = document.getElementById('saleDate');
+    if (dateEl) dateEl.value = sale.saleDate || '';
+
+    const nameEl = document.getElementById('saleCustomerName');
+    if (nameEl) nameEl.value = sale.customerName === 'زبون عام' ? '' : sale.customerName;
+
+    const phoneEl = document.getElementById('saleCustomerPhone');
+    if (phoneEl) phoneEl.value = sale.customerPhone || '';
+
+    const qtyEl = document.getElementById('saleQuantity');
+    if (qtyEl) qtyEl.value = sale.quantity;
+
+    const priceEl = document.getElementById('saleUnitPrice');
+    if (priceEl) priceEl.value = sale.unitPrice;
+
+    const discEl = document.getElementById('saleDiscount');
+    if (discEl) discEl.value = sale.discount || 0;
+
+    const notesEl = document.getElementById('saleNotes');
+    if (notesEl) notesEl.value = sale.notes || '';
+
+    this.recalculateSaleModal();
+    ui.saleModal.show();
   }
 
   openDebtPayment(saleId) {

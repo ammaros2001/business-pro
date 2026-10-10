@@ -1283,6 +1283,7 @@
               <table class="table-custom">
                 <thead>
                   <tr>
+                    <th style="width: 50px;">#</th>
                     <th>الفاتورة</th>
                     <th>التاريخ</th>
                     <th>الزبون</th>
@@ -1291,6 +1292,7 @@
                     <th>الإجمالي</th>
                     <th>صافي الربح</th>
                     <th>حالة الدفع</th>
+                    <th class="text-center" style="width: 100px;">الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody id="modalBizSalesTableBody"></tbody>
@@ -1340,13 +1342,14 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content modal-content-dark">
       <div class="modal-header modal-header-dark">
-        <h5 class="modal-title fw-bold text-white">
+        <h5 class="modal-title fw-bold text-white" id="saleModalTitle">
           <i class="bi bi-cart-plus text-success me-1"></i> تسجيل عملية بيع جديدة
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-4">
         <form id="saleForm" onsubmit="return false;">
+          <input type="hidden" id="editingSaleId">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label" for="saleBusinessSelect">اختر المشروع / البزنس <span class="text-danger">*</span></label>
@@ -1787,11 +1790,11 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <!-- Modular Application Scripts -->
-<script src="js/firebase-config.js?v=2.5"></script>
-<script src="js/store.js?v=2.5"></script>
-<script src="js/firebase-service.js?v=2.5"></script>
-<script src="js/ui.js?v=2.5"></script>
-<script src="js/app.js?v=2.5"></script>
+<script src="js/firebase-config.js?v=2.6"></script>
+<script src="js/store.js?v=2.6"></script>
+<script src="js/firebase-service.js?v=2.6"></script>
+<script src="js/ui.js?v=2.6"></script>
+<script src="js/app.js?v=2.6"></script>
 
 </body>
 </html>
