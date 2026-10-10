@@ -253,8 +253,8 @@ class DataStore {
     const totalDirectSellingExpenses = sales.reduce((acc, s) => acc + (parseFloat(s.sellingExpenses) || 0), 0);
     const totalOperatingExpenses = expenses.reduce((acc, e) => acc + (parseFloat(e.amountLYD) || 0), 0);
 
-    // صافي الربح المتحقق من المبيعات الفعلية ناقص تكلفة البضاعة المباعة والمصاريف
-    const realizedNetProfit = totalSalesRevenue - totalCOGS - totalDirectSellingExpenses - totalOperatingExpenses;
+    // صافي الربح الفعلي بعد استرداد كامل رأس المال المستثمر في المشروع والمصاريف الإضافية
+    const realizedNetProfit = totalSalesRevenue - (biz.totalCapital || 0) - totalOperatingExpenses;
     const profitMargin = totalSalesRevenue > 0 ? (realizedNetProfit / totalSalesRevenue) * 100 : 0;
     const roi = biz.totalCapital > 0 ? (realizedNetProfit / biz.totalCapital) * 100 : 0;
 
@@ -543,8 +543,8 @@ class DataStore {
     // إجمالي المصروفات الكلية (المصروفات التشغيلية + مصاريف البيع المباشرة)
     const totalExpenses = totalOperatingExpenses + totalDirectSellingExpenses;
 
-    // صافي الربح المحقق = إجمالي المبيعات - COGS - المصروفات الكلية
-    const netProfit = totalSalesRevenue - totalCOGS - totalExpenses;
+    // صافي الربح المحقق الكلي = إجمالي المبيعات - إجمالي رأس المال المستثمر - المصروفات الكلية
+    const netProfit = totalSalesRevenue - totalCapital - totalExpenses;
     const profitMargin = totalSalesRevenue > 0 ? (netProfit / totalSalesRevenue) * 100 : 0;
 
     // قيمة المخزون المتبقي لجميع المشاريع النشطة
