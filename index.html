@@ -16,6 +16,19 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
+  <!-- Progressive Web App (PWA) & Mobile Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Apple iOS Mobile Web App Settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="بزنس برو">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
   <!-- Custom Dark Emerald Theme CSS -->
   <link rel="stylesheet" href="css/style.css?v=3.3">
 </head>
@@ -222,6 +235,11 @@
     </div>
 
     <div class="sidebar-footer">
+      <!-- PWA Install Button -->
+      <button type="button" class="btn btn-outline-emerald btn-sm w-100 mb-2 d-none" id="pwaInstallSidebarBtn">
+        <i class="bi bi-phone-fill me-1"></i> تثبيت التطبيق على الهاتف
+      </button>
+
       <div class="sync-status-pill" id="sidebarSyncPill" style="cursor: pointer;" title="انقر لتسجيل الدخول أو المزامنة السحابية">
         <span class="status-indicator" id="syncIndicator"></span>
         <span id="syncLabel" class="text-truncate">الوضع المحلي (Offline)</span>
@@ -298,7 +316,10 @@
           </span>
           <span class="text-white small">أنت تستكشف النظام الآن ببيانات تجريبية محلية. لحفظ مشاريعك ومزامنتها على هاتفك، يمكنك تسجيل الدخول في أي وقت.</span>
         </div>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button class="btn btn-outline-emerald btn-sm py-1 px-2 d-none" id="pwaInstallBannerBtn" type="button">
+            <i class="bi bi-download me-1"></i> تثبيت كتطبيق
+          </button>
           <button class="btn btn-outline-info btn-sm py-1 px-2" id="bannerGuideBtn" type="button">
             <i class="bi bi-info-circle me-1"></i> آلية عمل النظام
           </button>
@@ -1844,6 +1865,71 @@
 <script src="js/firebase-service.js?v=3.3"></script>
 <script src="js/ui.js?v=3.3"></script>
 <script src="js/app.js?v=3.3"></script>
+
+<!-- Progressive Web App (PWA) Service Worker & Installation Logic -->
+<script>
+  // 1. تسجيل الـ Service Worker لتمكين التثبيت وعمل التطبيق بدون اتصال
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => {
+          console.log('Business Pro PWA Service Worker Registered:', reg.scope);
+        })
+        .catch(err => {
+          console.warn('PWA Service Worker Registration Failed:', err);
+        });
+    });
+  }
+
+  // 2. معالجة وتفعيل زر تثبيت التطبيق للهواتف
+  let deferredPwaPrompt;
+  const pwaSidebarBtn = document.getElementById('pwaInstallSidebarBtn');
+  const pwaBannerBtn = document.getElementById('pwaInstallBannerBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // منع المتصفح من إظهار النافذة الافتراضية المفاجئة
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    
+    // إظهار أزرار التثبيت المخصصة داخل التطبيق
+    if (pwaSidebarBtn) pwaSidebarBtn.classList.remove('d-none');
+    if (pwaBannerBtn) pwaBannerBtn.classList.remove('d-none');
+  });
+
+  function triggerPwaInstall() {
+    if (deferredPwaPrompt) {
+      deferredPwaPrompt.prompt();
+      deferredPwaPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User installed Business Pro PWA');
+        }
+        deferredPwaPrompt = null;
+        if (pwaSidebarBtn) pwaSidebarBtn.classList.add('d-none');
+        if (pwaBannerBtn) pwaBannerBtn.classList.add('d-none');
+      });
+    } else {
+      // للمتصفحات التي لا تدعم beforeinstallprompt (مثل Safari على هواتف iPhone)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        alert("لتثبيت التطبيق على الآيفون:\n1. اضغط على زر المشاركة (Share 📤) أسفل الشاشة.\n2. اختر 'إضافة إلى الصفحة الرئيسية' (Add to Home Screen ➕).\nوسيعمل كتطبيق مستقل بكامل مزاياه!");
+      } else {
+        alert("لتثبيت التطبيق على جهازك:\nانقر على قائمة المتصفح (الثلاث نقاط ⋮ بأعلى الصفحة) ثم اختر 'تثبيت التطبيق' أو 'إضافة إلى الشاشة الرئيسية'.");
+      }
+    }
+  }
+
+  if (pwaSidebarBtn) pwaSidebarBtn.addEventListener('click', triggerPwaInstall);
+  if (pwaBannerBtn) pwaBannerBtn.addEventListener('click', triggerPwaInstall);
+
+  window.addEventListener('appinstalled', () => {
+    deferredPwaPrompt = null;
+    if (pwaSidebarBtn) pwaSidebarBtn.classList.add('d-none');
+    if (pwaBannerBtn) pwaBannerBtn.classList.add('d-none');
+    if (window.ui && typeof window.ui.showToast === 'function') {
+      ui.showToast('تم تثبيت تطبيق بزنس برو بنجاح على شاشتك الرئيسية! 🎉', 'success');
+    }
+  });
+</script>
 
 </body>
 </html>
