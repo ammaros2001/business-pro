@@ -235,8 +235,15 @@ class UIManager {
     const val = parseFloat(num);
     if (isNaN(val)) return '0';
 
-    // التقريب لأقرب عدد صحيح فقط بدون أي فواصل عشرية أو فواصل آلاف
-    return Math.round(val).toString();
+    // نتحقق من وجود كسور عشرية (قروش / سنتات)
+    const rounded = Math.round(val * 100) / 100;
+    const parts = rounded.toFixed(2).split('.');
+
+    // وضع فاصلة الآلاف بعد كل ثالث رقم (مثال: 1,000 أو 25,500 أو 1,000,000)
+    const integerWithCommas = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    // إذا كانت الكسور صفر نعرض الرقم بفاصلة الآلاف فقط، وإذا كانت غير صفر نعرض الكسر بدقة
+    return parts[1] === '00' ? integerWithCommas : `${integerWithCommas}.${parts[1]}`;
   }
 
   /* ==========================================================================

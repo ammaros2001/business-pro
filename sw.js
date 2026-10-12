@@ -3,7 +3,7 @@
  * Enables offline caching, fast loading, and home-screen installability.
  */
 
-const CACHE_NAME = 'biz-pro-cache-v3.5';
+const CACHE_NAME = 'biz-pro-cache-v3.8';
 
 const PRECACHE_ASSETS = [
   './',
